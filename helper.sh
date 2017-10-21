@@ -12,21 +12,23 @@ source utils.sh
 # Private: Transform dependency and return its github url
 #
 # $1 - POM
-# $2 - Repo absolute folder
-# $3 - Override properties
-# $4 - Settings
+# $2 - Effective POM
+# $3 - Repo absolute folder
+# $4 - Override properties
+# $5 - Settings
 #
 # Examples
 #
-#   getURL "azure-pom.xml" "./target/azure" "./override.properties" "~/m2/settings.xml"
+#   getURL "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" "./override.properties" "~/m2/settings.xml"
 #
 # Returns the github URL/unreachable/scm
 #
 function getURL {
     pom=$1
-    repo=$2
-    override=$3
-    settings=$4
+    effective=$2
+    repo=$3
+    override=$4
+    settings=$5
 
     # Validate mandatory ARGUMENTS
     if [ ! -f $pom ] ; then
@@ -34,7 +36,6 @@ function getURL {
         exit 1
     fi
 
-    effective=${repo}.effective
     build_log=${repo}.log
 
     # Normalise packaging issue
@@ -42,7 +43,7 @@ function getURL {
 
     # Get effective-pom
     [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-    mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} | tee ${build_log}
+    mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} &> ${build_log}
 
     # Get effective artifact
     artifactId=$(get ${effective} "project.artifactId" ${settings})
@@ -177,7 +178,7 @@ function buildDependency {
     if [ ! -e $FLAG_FILE ] ; then
         [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
         set -o pipefail
-        mvn -e -V -B -ff clean install ${maven_flags} -T 1C ${SETTINGS} >> ${build_log}
+        mvn -e -V -B -ff clean install ${MAVEN_FLAGS} -T 1C ${SETTINGS} >> ${build_log}
         [ $? -eq 0 ] && status=${CTE_PASSED} || status=${CTE_FAILED}
         echo $status > $FLAG_FILE
     fi

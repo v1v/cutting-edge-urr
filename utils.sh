@@ -21,7 +21,7 @@ CTE_UNREACHABLE="unreachable"
 #
 # $1 - POM file.
 # $2 - expression to be evaluated.
-# $4 - Settings.
+# $3 - Settings.
 #
 # Examples
 #
@@ -30,7 +30,7 @@ CTE_UNREACHABLE="unreachable"
 # Returns the exit code of the last command executed.
 #
 function get {
-    [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+    [ -f "$3" ] && SETTINGS="-s $3" || SETTINGS=""
     mvn -B help:evaluate -Dexpression=$2 -f $1 ${SETTINGS} | grep -e '^[^\[]' | grep -v 'INFO'
 }
 
@@ -105,20 +105,6 @@ function notify {
 #
 function convertHttps2Git {
     echo $1 | sed 's#.*github.com/#git@github.com:#g'
-}
-
-# Public: Convert git protocols to git+https
-#
-# $1 - git url
-#
-# Examples
-#
-#   convertGit2Https "git-ssh"
-#
-# Returns the exit code of the last command executed.
-#
-function convertGit2Https {
-    echo $1 | sed 's/git:/https:/' | sed 's#ssh://git@#https://#' | sed 's#git@github.com:#https://github.com/#' | sed 's#http://github#https://github#'
 }
 
 # Public: Check whether a particular URL is reachable using Curl

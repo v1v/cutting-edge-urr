@@ -83,6 +83,7 @@
 
 ## Load utils library (which included templates and some other utilities)
 source utils.sh
+source helper.sh
 
 ## Variables
 CURRENT=$(pwd)
@@ -231,20 +232,21 @@ do
     echo "${index} of ${total} unique pom files"
     cd ${CURRENT}
     repo="${CURRENT}/target/$(basename ${pom})"
+    effective=${pom}.effective
 
     # Get URL
-    url=$(getURL ${pom} "${repo}")
+    url=$(getURL ${pom} ${effective} "${repo}" "${OVERRIDE_FILE}" "${SETTINGS}")
 
     # If it's found then
     if [ "$url" != "${CTE_UNREACHABLE}" -a "$url" != "${CTE_SCM}" ] ; then
         # Transform URL to be able to use it within rosie and also support multimodule maven projects
         url=$(transform $url)
-        repo="${CURRENT}/target/$(basename ${newurl})"
+        repo="${CURRENT}/target/$(basename ${url})"
         download=$(download ${url} ${repo})
         if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
             build_log=${repo}.log
             description=$(buildDependency ${repo} ${build_log} ${SKIP_TESTS} ${SETTINGS} ${MAVEN_FLAGS})
-            newversion=$(get ${repo}/pom.xml "project.version")
+            newversion=$(get ${repo}/pom.xml "project.version" ${SETTINGS})
             [ "${description}" == "${CTE_PASSED}" ] && state=${CTE_SUCCESS} || state=${CTE_WARNING}
         else
             description=${CTE_UNREACHABLE}
@@ -258,9 +260,9 @@ do
     fi
 
     # Get GAVC
-    groupId=$(get ${effective} "project.groupId")
-    artifactId=$(get ${effective} "project.artifactId")
-    version=$(get ${effective} "project.version")
+    groupId=$(get ${effective} "project.groupId" ${SETTINGS})
+    artifactId=$(get ${effective} "project.artifactId" ${SETTINGS})
+    version=$(get ${effective} "project.version" ${SETTINGS})
 
     notify ${groupId} ${artifactId} ${version} ${newVersion} "${url}" ${state} ${description} ${HTML} ${JSON} ${PME}
 
