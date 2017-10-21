@@ -1,0 +1,7 @@
+<extensions>
+    <extension>
+        <artifactId>pom-manipulation-ext</artifactId>
+        <groupId>org.commonjava.maven.ext</groupId>
+        <version>2.12</version>
+    </extension>
+</extensions>
