@@ -87,10 +87,11 @@ source "$( dirname "${BASH_SOURCE[0]}" )/helper.sh"
 
 ## Variables
 CURRENT=$(pwd)
+EDGE=${CURRENT}/target/edge
 PME=${CURRENT}/target/pom.xml.pme
 JSON=${CURRENT}/target/dependencies.json
 HTML=${CURRENT}/target/dependencies.html
-UNIQUE_POMS=${CURRENT}/target/poms
+UNIQUE_POMS=${EDGE}/poms
 export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 
 ## Arguments
@@ -190,19 +191,20 @@ function initialise {
             fi
         fi
 
+        echo "Getting hpi dependencies..."
         mvn -B -V -s ${SETTINGS} clean org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies \
                     -Dmdep.copyPom \
                     -DincludeTypes=hpi \
-                    -DexcludeTransitive \
                     ${excludeArtifacts} \
-                    ${excludeGroups}
+                    ${excludeGroups} > /dev/null
 
         # Remove unused artifacts
         find . -name *.hpi -delete
 
         # In some cases the root target folder is not created when using some exclude options
-        mkdir -p ${CURRENT}/target
+        mkdir -p ${EDGE}
 
+        echo "Preparing reports..."
         openHTML ${HTML}
         openJSON ${JSON}
         openPME  ${PME}
@@ -214,49 +216,49 @@ function initialise {
 ################################# MAIN #########################################
 
 initialise
-echo "There are: $(find . -name *.pom -type f | sort | wc -l) pom files"
+echo "There are: $(find . -name *.pom -type f -not -path "./target/**/src/*" | sort | wc -l | sed 's# ##g') pom files"
 echo "There are: ${total} dependencies to cutting the edge ..."
 
 # Let's remove duplicated dependencies by using a temp folder
 mkdir -p ${UNIQUE_POMS}
-find . -name *.pom -type f | while read -r i; do cp "$i" ${UNIQUE_POMS}; done
+find . -name *.pom -type f -not -path "./target/**/src/*" | while read -r i; do cp "$i" ${UNIQUE_POMS}; done
 
-echo "DEBUG|POM files to be processed..."
-find ${UNIQUE_POMS} -name *.pom -type f | sort
-total=$(find ${UNIQUE_POMS} -name *.pom -type f | sort | uniq | wc -l)
+total=$(find ${UNIQUE_POMS} -name *.pom -type f | sort | uniq | wc -l | sed 's# ##g')
 
 index=1
 # Per unique dependency then let's build with latest
 find ${UNIQUE_POMS} -name *.pom -type f | sort | while read pom
 do
-    echo "${index} of ${total} unique pom files"
+    echo "\t${index} of ${total} unique pom files (${pom})"
     cd ${CURRENT}
-    repo="${CURRENT}/target/$(basename ${pom})"
+    repo="${EDGE}/$(basename ${pom})"
     effective=${pom}.effective
+    newVersion=${CTE_NONE}
 
     # Get URL
     url=$(getURL ${pom} ${effective} "${repo}" "${OVERRIDE_FILE}" "${SETTINGS}")
-
+    echo "\t\t getURL stage - ${url}"
     # If it's found then
     if [ "$url" != "${CTE_UNREACHABLE}" -a "$url" != "${CTE_SCM}" ] ; then
         # Transform URL to be able to use it within rosie and also support multimodule maven projects
         url=$(transform $url)
-        repo="${CURRENT}/target/$(basename ${url})"
+        echo "\t\t transform stage - ${url}"
+        repo="${EDGE}/$(basename ${url})"
         download=$(download ${url} ${repo})
+        echo "\t\t download stage - ${download}"
         if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
             build_log=${repo}.log
             description=$(buildDependency ${repo} ${build_log} ${SKIP_TESTS} ${SETTINGS} ${MAVEN_FLAGS})
-            newversion=$(get ${repo}/pom.xml "project.version" ${SETTINGS})
+            echo "\t\t buildDependency stage - ${description}"
+            newVersion=$(get ${repo}/pom.xml "project.version" ${SETTINGS})
             [ "${description}" == "${CTE_PASSED}" ] && state=${CTE_SUCCESS} || state=${CTE_WARNING}
         else
             description=${CTE_UNREACHABLE}
             state=${CTE_DANGER}
-            newversion=${CTE_NONE}
         fi
     else
         description=${url}
         state=${CTE_DANGER}
-        newversion=${CTE_NONE}
     fi
 
     # Get GAVC
@@ -265,7 +267,8 @@ do
     version=$(get ${effective} "project.version" ${SETTINGS})
 
     notify ${groupId} ${artifactId} ${version} ${newVersion} "${url}" ${state} ${description} ${HTML} ${JSON} ${PME}
-
+    echo "\t\t notify stage - ${state}"
+    echo "\t\t 'old GAV' - ${groupId}:${artifactId}:${version} 'new GAV' - ${groupId}:${artifactId}:${newVersion}"
     let "index++"
 done
 
