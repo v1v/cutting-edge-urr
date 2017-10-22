@@ -216,14 +216,14 @@ function initialise {
 ################################# MAIN #########################################
 
 initialise
-echo "There are: $(find . -name *.pom -type f -not -path "./target/**/src/*" | sort | wc -l | sed 's# ##g') pom files"
-echo "There are: ${total} dependencies to cutting the edge ..."
 
 # Let's remove duplicated dependencies by using a temp folder
 mkdir -p ${UNIQUE_POMS}
 find . -name *.pom -type f -not -path "./target/**/src/*" | while read -r i; do cp "$i" ${UNIQUE_POMS}; done
-
 total=$(find ${UNIQUE_POMS} -name *.pom -type f | sort | uniq | wc -l | sed 's# ##g')
+
+echo "There are: $(find . -name *.pom -type f -not -path "./target/**/src/*" | sort | wc -l | sed 's# ##g') pom files"
+echo "There are: ${total} dependencies to cutting the edge ..."
 
 index=1
 # Per unique dependency then let's build with latest
