@@ -7,7 +7,7 @@
 #
 
 ## Load utils library (which included templates and some other utilities)
-source utils.sh
+source "$( dirname "${BASH_SOURCE[0]}" )/utils.sh"
 
 # Private: Transform dependency and return its github url
 #

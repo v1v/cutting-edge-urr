@@ -82,8 +82,8 @@
 #
 
 ## Load utils library (which included templates and some other utilities)
-source utils.sh
-source helper.sh
+source "$( dirname "${BASH_SOURCE[0]}" )/utils.sh"
+source "$( dirname "${BASH_SOURCE[0]}" )/helper.sh"
 
 ## Variables
 CURRENT=$(pwd)
