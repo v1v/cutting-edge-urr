@@ -19,15 +19,15 @@
 #           Settings.xml file to be used, file path based.
 #
 #       -o/--override <file>
-#           Override file whcih contains a key=value uples which will override the URLs. Default: override.properties
+#           Override file whcih contains a key=value uples which will override the URLs.
 #           This file is _ONLY_ relative to the root folder.
 #
 #       -xa/--exclude-artifacts <file>
-#           File based on comma separated list of ArtifactId Names to exclude. Default: excludeArtifactIds.properties
+#           File based on comma separated list of ArtifactId Names to exclude.
 #           This file can be either relative to the root folder or absolute path.
 #
 #       -xg/--exclude-artifacts <file>
-#           File based on comma separated list of GroupId Names to exclude. Default: excludeGroupIds.properties
+#           File based on comma separated list of GroupId Names to exclude.
 #           This file can be either relative to the root folder or absolute path.
 #
 #       -r,  --recipes  <folder
@@ -133,13 +133,13 @@ validate_arguments() {
 }
 
 # Public: Maven settings.xml file to be used, file path based.
-SETTINGS=settings.xml
+SETTINGS=
 # Public: Properties file with a list of key=url tuples (key -> groupId.artifactId=https://)
-OVERRIDE_FILE=override.properties
+OVERRIDE_FILE=
 # Public: File based on comma separated list of ArtifactId Names to exclude.
-EXCLUDE_ARTIFACTS_FILE=excludeArtifactIds.properties
+EXCLUDE_ARTIFACTS_FILE=
 # Public: File based on comma separated list of GroupId Names to exclude.
-EXCLUDE_GROUPS_FILE=excludeGroupIds.properties
+EXCLUDE_GROUPS_FILE=
 # Public: Folder with the recipes to be used when declared=.
 RECIPES_FOLDER=
 # Public: Whether to skip tests when installing those plugins locally.
