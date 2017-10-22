@@ -6,11 +6,12 @@ load 'libs/bats-assert/load'
 setup() {
     source helper.sh
     export TEMP_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+    export EFFECTIVE_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export TEMP_DIR=$(mktemp -d /tmp/bats.XXXXXXXXXX)
     export OVERRIDE_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export NO_SCM_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export CONNECTION_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
-
+    export TEMP_DIR_NEW=${TEMP_DIR}.new
     cat <<EOT > $OVERRIDE_FILE
 [url]
     ant = overrided_url
@@ -43,44 +44,45 @@ EOT
 
 }
 
-
 teardown() {
     rm ${TEMP_FILE}
-    rm -rf ${TEMP_DIR}*
+    rm -rf ${TEMP_DIR}
+    rm -rf ${TEMP_DIR_NEW}
     rm ${OVERRIDE_FILE}
     rm ${NO_SCM_POM_FILE}
     rm ${CONNECTION_POM_FILE}
+    rm $EFFECTIVE_FILE
 }
 
-@test "Should return URL when queering Maven plugin" { skip
+@test "Should return URL when queering Maven plugin" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/maven-plugin/maven-plugin-3.0/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} "${TEMP_DIR}/new" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
     assert_output "http://github.com/jenkinsci/maven-plugin"
 }
 
-@test "Should return overrided_url when quering ANT plugin in an existing override file" { skip
+@test "Should return overrided_url when quering ANT plugin in an existing override file" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/ant-plugin/ant-1.7/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} "${TEMP_DIR}/new" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
     assert_output "overrided_url"
 }
 
-@test "Should return unreachalbe when quering ace-editor plugin " { skip
+@test "Should return unreachalbe when quering ace-editor plugin " {
     wget -q "https://raw.githubusercontent.com/jenkinsci/js-libs/master/ace-editor/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} "${TEMP_DIR}/new" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
     assert_output ${CTE_UNREACHABLE}
 }
 
-@test "Should return scm when quering POM without SCM " { skip
-    run getURL ${NO_SCM_POM_FILE} "${TEMP_DIR}/new" ${OVERRIDE_FILE}
+@test "Should return scm when quering POM without SCM " {
+    run getURL ${NO_SCM_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
     assert_output ${CTE_SCM}
 }
 
-@test "Should return connection URL when quering POM scm " { skip
-    run getURL ${CONNECTION_POM_FILE} "${TEMP_DIR}/new" ${OVERRIDE_FILE}
+@test "Should return connection URL when quering POM scm " {
+    run getURL ${CONNECTION_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
     assert_output "git://github.com/jenkinsci/gradle-plugin.git"
 }
 
-@test "Should return same git url when based on organisation/repo" { skip
+@test "Should return same git url when based on organisation/repo" {
     cat <<EOT > $TEMP_FILE
     https://github.com/user/project
     https://username::;*%$:@github.com/username/repository.git
@@ -98,7 +100,7 @@ EOT
     done <$TEMP_FILE
 }
 
-@test "Should transform git url based on organisation/repo" { skip
+@test "Should transform git url based on organisation/repo" {
     run transform 'http://github.com/user/project.git/submodule'
     assert_output 'https://github.com/user/project.git'
     run transform 'https://github.com/user/project/submodule'
@@ -123,7 +125,7 @@ EOT
     assert_output 'git@github.com:cloudbees/repository.git'
 }
 
-@test "Should return git+ssh when using cloudbees private repo" { skip
+@test "Should return git+ssh when using cloudbees private repo" {
     run transform 'http://github.com/cloudbees/project.git'
     assert_output 'git@github.com:cloudbees/project.git'
     run transform 'http://github.com/cloudbees/project'
@@ -134,9 +136,11 @@ EOT
     assert_output 'git@github.com:cloudbees/repository'
     run transform 'scm:git:git://github.com/cloudbees/repository.git'
     assert_output 'git@github.com:cloudbees/repository.git'
+    run transform 'git@github.com:cloudbees/cloudbees-aws-cli-plugin.git'
+    assert_output 'git@github.com:cloudbees/cloudbees-aws-cli-plugin.git'
 }
 
-@test "Should transform scm/connection urls" { skip
+@test "Should transform scm/connection urls" {
     run transform 'scm:git:git://github.com/user/repo.git'
     assert_output 'https://github.com/user/repo.git'
     run transform 'scm:git:git@github.com:user/repo.git'
@@ -150,21 +154,21 @@ EOT
 @test "Should download" {
     run download "https://github.com/octocat/Hello-World" ${TEMP_DIR}
     assert_output "${CTE_SKIPPED}"
-    run download "https://github.com/octocat/Hello-World1" "${TEMP_DIR}.new"
+    run download "https://github.com/octocat/Hello-World1" "${TEMP_DIR_NEW}"
     assert_output "${CTE_UNREACHABLE}"
-    run download "https://github.com/octocat/Hello-World" "${TEMP_DIR}.new"
+    run download "https://github.com/octocat/Hello-World" "${TEMP_DIR_NEW}"
     assert_output "${CTE_PASSED}"
 }
 
 
 @test "Should buildDependency" {
-    download https://github.com/dantheman213/java-hello-world-maven.git "${TEMP_DIR}.new"
-    run buildDependency "${TEMP_DIR}.new" "${TEMP_FILE}" "true" "~/.m2/settings.xml" ""
+    download https://github.com/dantheman213/java-hello-world-maven.git "${TEMP_DIR_NEW}"
+    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "true" "~/.m2/settings.xml" ""
     assert_output "${CTE_PASSED}"
-    echo "passed" > "${TEMP_DIR}.new/.status.flag"
-    run buildDependency "${TEMP_DIR}.new" "${TEMP_FILE}" "true" "~/.m2/settings.xml" ""
+    echo "passed" > "${TEMP_DIR_NEW}/.status.flag"
+    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "true" "~/.m2/settings.xml" ""
     assert_output "${CTE_PASSED}"
-    echo "failed" > "${TEMP_DIR}.new/.status.flag"
-    run buildDependency "${TEMP_DIR}.new" "${TEMP_FILE}" "true" "~/.m2/settings.xml" ""
+    echo "failed" > "${TEMP_DIR_NEW}/.status.flag"
+    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "true" "~/.m2/settings.xml" ""
     assert_output "${CTE_FAILED}"
 }

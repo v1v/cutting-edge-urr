@@ -99,7 +99,7 @@ function transform {
     newurl=$(echo $url | sed -E 's#scm.*github.com(:|/)?#https://github.com/#')
 
     # Convert to github.com/organisation/project
-    newurl=$(echo $newurl | sed -Ene's#(.*github.com:?//?[^/]*/[^/]*).*#\1#p')
+    newurl=$(echo $newurl | sed -Ene's#(.*github.com:?/?/?[^/]*/[^/]*).*#\1#p')
 
     # Convert to https
     newurl=$(echo $newurl | sed -E 's#http:/#https:/#')
