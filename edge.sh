@@ -3,7 +3,7 @@
 #       edge - the stupid cutting edge script
 #
 # SYNOPSIS
-#       edge -s <file> -o <file> -xa <file> -xg <file> -(N)X -(N)I -(N)S
+#       edge -s <file> -o <file> -xa <file> -xg <file> -r <folder> -(N)X -(N)I -(N)S
 #
 # DESCRIPTION
 #       Edge retrieves each pom dependency based on some exclude filters then:
@@ -29,6 +29,9 @@
 #       -xg/--exclude-artifacts <file>
 #           File based on comma separated list of GroupId Names to exclude. Default: excludeGroupIds.properties
 #           This file can be either relative to the root folder or absolute path.
+#
+#       -r,  --recipes  <folder
+#           Folder with the build recipes to be override if required.
 #
 #       -(N)X/--(no-)skip-test
 #			Whether to skip run tests when running maven install goal.  Default: true
@@ -102,6 +105,7 @@ display_help() {
     echo "   -o,  --override           Override scm urls file based on key=value tuples."
     echo "   -xa, --exclude-artifacts  File based on comma separated list of ArtifactId Names to exclude."
     echo "   -xg, --exclude-groups     File based on comma separated list of GroupId Names to exclude."
+    echo "   -r,  --recipes            Folder with the build recipes to be override if required."
     echo "   -(N)X,  --(no-)skip-test          Whether to skip tests when installing those dependencies locally."
     echo "   -(N)I,  --(no-)incremental        Whether to clean or start from the previous execution."
     echo "   -(N)S,  --(no-)ssh                Whether to transform git urls to git+ssh to allow access to private repos."
@@ -123,6 +127,9 @@ validate_arguments() {
     if [ ! -e $EXCLUDE_GROUPS_FILE ]; then
         echo "WRONG: excludeGroupIds file doesn't exist" ; exit 1
     fi
+    if [ ! -d $RECIPES_FOLDER ]; then
+        echo "WRONG: recipes folder doesn't exist" ; exit 1
+    fi
 }
 
 # Public: Maven settings.xml file to be used, file path based.
@@ -133,6 +140,8 @@ OVERRIDE_FILE=override.properties
 EXCLUDE_ARTIFACTS_FILE=excludeArtifactIds.properties
 # Public: File based on comma separated list of GroupId Names to exclude.
 EXCLUDE_GROUPS_FILE=excludeGroupIds.properties
+# Public: Folder with the recipes to be used when declared=.
+RECIPES_FOLDER=
 # Public: Whether to skip tests when installing those plugins locally.
 SKIP_TESTS=true
 # Public: Whether to clean or start from the last execution.
@@ -154,6 +163,7 @@ case $key in
     -o|--override) OVERRIDE_FILE="$2"; shift 2;;
     -xa|--exclude-artifacts) EXCLUDE_ARTIFACTS_FILE="$2"; shift 2;;
     -xg|--exclude-groups) EXCLUDE_GROUPS_FILE="$2"; shift 2;;
+    -r|--recipes) RECIPES_FOLDER="$2"; shift 2;;
     -X|--skip-test) SKIP_TESTS=true; shift 1;;
     -I|--incremental) INCREMENTAL=true; shift 1;;
     -S|--ssh) SSH_GIT=true; shift 1;;
@@ -247,10 +257,11 @@ do
         download=$(download ${url} ${repo})
         echo "\t\t download stage - ${download}"
         if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
-            build_log=${repo}.log
-            description=$(buildDependency ${repo} ${build_log} ${SKIP_TESTS} ${SETTINGS} ${MAVEN_FLAGS})
-            echo "\t\t buildDependency stage - ${description}"
             newVersion=$(get ${repo}/pom.xml "project.version" ${SETTINGS})
+            artifactId=$(get ${repo}/pom.xml "project.version" ${SETTINGS})
+            build_log=${repo}.log
+            description=$(buildDependency ${repo} ${build_log} ${SETTINGS} ${SKIP_TESTS} ${artifactId} "${RECIPES_FOLDER}" )
+            echo "\t\t buildDependency stage - ${description}"
             [ "${description}" == "${CTE_PASSED}" ] && state=${CTE_SUCCESS} || state=${CTE_WARNING}
         else
             description=${CTE_UNREACHABLE}

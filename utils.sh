@@ -51,19 +51,19 @@ function getXMLProperty {
     xmlstarlet pyx $1 | grep -v ^A | xmlstarlet p2x | xmlstarlet sel -t -v $2
 }
 
-# Public: Get the overrided url given a property files and the artifactId.
+# Public: Get the overrided property given a property files and the key.
 #
 # $1 - Properties file (git config based)
-# $2 - artifactId to be evaluated.
+# $2 - property to be evaluated.
 #
 # Examples
 #
-#   getOverridedURL "file.properties" "artifactId"
+#   getOverridedProperty "file.properties" "url.artifactId"
 #
 # Returns the exit code of the last command executed.
 #
-function getOverridedURL {
-    git config --file=$1 --get url.$2
+function getOverridedProperty {
+    git config --file=$1 --get $2
 }
 
 # Public: Notify other reporting functions

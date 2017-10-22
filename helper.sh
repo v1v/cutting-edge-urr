@@ -49,7 +49,7 @@ function getURL {
     artifactId=$(get ${effective} "project.artifactId" ${settings})
 
     # Override?
-    url=$(getOverridedURL ${override} ${artifactId})
+    url=$(getOverridedProperty ${override} url.${artifactId})
 
     if [ -n "${url}" ] ; then
         status=${url}
@@ -95,16 +95,16 @@ function getURL {
 function transform {
     url=$1
 
-    # Convert scm:git:git://github.com scm:git:git@github.com:
+    # Convert scm:git:git://github.com  and scm:git:git@github.com to https
     newurl=$(echo $url | sed -E 's#scm.*github.com(:|/)?#https://github.com/#')
 
-    # Convert to github.com/organisation/project
+    # Convert repos to github.com/organisation/project
     newurl=$(echo $newurl | sed -Ene's#(.*github.com:?/?/?[^/]*/[^/]*).*#\1#p')
 
-    # Convert to https
+    # Convert to http to https
     newurl=$(echo $newurl | sed -E 's#http:/#https:/#')
 
-    # Convert private organsiations to ssh
+    # Convert private organisations to ssh
     if echo "$newurl" | grep --quiet 'cloudbees/'; then
         newurl=$(convertHttps2Git $newurl)
     fi
@@ -143,40 +143,44 @@ function download {
 }
 
 
-# Private: Run maven goals in the dependency
+# Private: Run build goals in the dependency
 #
 # $1 - repo folder
 # $2 - build_log
-# $3 - groupId
-# $4 - artifactId
-# $5 - version
-# $6 - url
+# $3 - settings
+# $4 - skip_tests
+# $5 - artifactid
+# $6 - recipes folder
 #
 # Uses CTE variables
 #
 # Examples
 #
-#   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "org.jenkins" "azure-cli" "1.0" "1.2" "https://"
+#   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "settings.xml" "true" "azure" "recipes"
 #
 # Returns the exit code of the last command executed.
 #
 function buildDependency {
     repo=$1
     build_log=$2
-    skip=$3
-    settings=$4
-    maven_flags=$5
+    settings=$3
+    skip=$4
+    artifactId=$5
+    recipes=$6
 
     FLAG_FILE=".status.flag"
-
     MAVEN_FLAGS="-DskipTests=${skip} -Dfindbugs.skip=${skip} -Dmaven.test.skip=${skip} -Dmaven.javadoc.skip=true"
-
     cd ${repo}
-    # Cache previous maven executions
+    # Cache previous build executions
     if [ ! -e $FLAG_FILE ] ; then
+        override_file="${recipes}/${artifactId}.build"
+        if [ -e "${override_file}" ] ; then
+            build_command=$(getOverridedProperty "${override_file}" build.command)
+        else
+            build_command="mvn -e -V -B -ff clean install ${MAVEN_FLAGS} -T 1C ${SETTINGS}"
+        fi
         [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-        set -o pipefail
-        mvn -e -V -B -ff clean install ${MAVEN_FLAGS} -T 1C ${SETTINGS} >> ${build_log}
+        ${build_command} >>${build_log} 2>&1
         [ $? -eq 0 ] && status=${CTE_PASSED} || status=${CTE_FAILED}
         echo $status > $FLAG_FILE
     fi
