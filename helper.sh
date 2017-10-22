@@ -43,7 +43,7 @@ function getURL {
 
     # Get effective-pom
     [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-    mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} &> ${build_log}
+    mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} >>${build_log} 2>&1
 
     # Get effective artifact
     artifactId=$(get ${effective} "project.artifactId" ${settings})
@@ -141,8 +141,6 @@ function download {
     fi
     echo ${status}
 }
-
-
 
 
 # Private: Run maven goals in the dependency
