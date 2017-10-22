@@ -36,6 +36,9 @@ if [ -e ${PME} ] ; then
     # List where that particular maven submodule failed
     pom=$(find products/$(basename `cat ${OUTPUT} | sed -Ene's#.*Working directory: (.+)#\1#p' | tail -n 1`) -name pom.xml)
     echo "It requires to fix the pom '${pom}' and 'pom.xml'"
+
+    # Generate html diff
+    git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o target/diff.html
 fi
 
 exit $build_status
