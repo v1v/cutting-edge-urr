@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 # NAME
 #       edge - the stupid cutting edge script
 #
