@@ -1,2 +1,0 @@
-[build]
-    command = ./gradlew publishToMavenLocal publishMavenJpiPublicationToMavenLocal -x test
