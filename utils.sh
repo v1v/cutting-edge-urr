@@ -526,7 +526,7 @@ EOT
 # Returns the exit code of the last command executed.
 #
 function normalisePackagingIssue {
-    sed -i '' 's#<packaging>hpi</packaging>##g' $1
+    sed -i.bck 's#<packaging>hpi</packaging>##g' $1
 }
 
 # Public: Filter log output and gather all the topological error messages
