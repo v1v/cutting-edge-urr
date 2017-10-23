@@ -33,7 +33,9 @@ EOT
     "newVersion": "newversion",
     "url": "url",
     "status": "status",
-    "description": "description"
+    "description": "description",
+    "envelope": "envelope",
+    "validate": "validate"
 },
 EOT
     cat <<EOT > $LI_FILE
@@ -43,6 +45,7 @@ EOT
             <span class="badge badge-pill badge-default">default</span>
             <span class="badge badge-pill badge-info">info</span>
             <span class="badge badge-pill badge-badge">description</span>
+            <span class="badge badge-pill badge-envelope">validate</span>
         </div>
     </li>
 EOT
@@ -103,7 +106,7 @@ EOT
 }
 
 @test "Should add json element" {
-    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" $TEMP_FILE
+    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "validate" $TEMP_FILE
     run diff $JSON_FILE $TEMP_FILE
     assert_output ''
 }
@@ -115,19 +118,19 @@ EOT
 }
 
 @test "Should add li element" {
-    li "name" "default" "info" "badge" "description" $TEMP_FILE
+    li "name" "default" "info" "badge" "description" "envelope" "validate" $TEMP_FILE
     run diff $LI_FILE $TEMP_FILE
     assert_output ''
 }
 
 @test "Should generate dependency when status is success" {
-    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "/tmp/null" "/tmp/null" $TEMP_FILE
+    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" $TEMP_FILE
     run diff $DEPENDENCY_FILE $TEMP_FILE
     assert_output ''
 }
 
 @test "Should not generate dependency when status is not success" {
-    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "/tmp/null" "/tmp/null" $TEMP_FILE
+    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" $TEMP_FILE
     run diff $EMPTY_FILE $TEMP_FILE
     assert_output ''
 }
@@ -183,4 +186,15 @@ EOT
     assert_output "git@github.com:user/project"
     run convertHttps2Git "git@github.com:user/project.git"
     assert_output "git@github.com:user/project.git"
+}
+
+@test "Should analyseTopological when filtering topological errors" {
+    cat <<EOT > $TEMP_FILE
+[ERROR] Plugin [nodejs]
+ERROR Plugin [nodejs]
+[ERROR] plugin [nodejs]
+[INFO] Plugin [nodejs]
+EOT
+    run analyseTopological $TEMP_FILE
+    assert_output ' [nodejs]'
 }
