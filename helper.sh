@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # Helper file which contains the functions used by the edge.sh file
 #
@@ -167,15 +167,15 @@ function buildDependency {
     recipes=$5
 
     FLAG_FILE=".status.flag"
-    MAVEN_FLAGS="-DskipTests=${skip} -Dfindbugs.skip=${skip} -Dmaven.test.skip=${skip} -Dmaven.javadoc.skip=true"
     cd ${repo}
-
-    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-
-    artifactId=$(getBuildProperty  ${repo} "project.artifactId" "name" "${settings}")
 
     # Cache previous build executions
     if [ ! -e $FLAG_FILE ] ; then
+        MAVEN_FLAGS="-DskipTests=${skip} -Dfindbugs.skip=${skip} -Dmaven.test.skip=${skip} -Dmaven.javadoc.skip=true"
+        [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+        artifactId=$(getBuildProperty  ${repo} "project.artifactId" "name" "${settings}")
+
         override_file="${recipes}/${artifactId}.build"
         if [ -e "${override_file}" ] ; then
             build_command=$(getOverridedProperty "${override_file}" build.command)
@@ -186,7 +186,7 @@ function buildDependency {
         [ $? -eq 0 ] && status=${CTE_PASSED} || status=${CTE_FAILED}
         echo $status > $FLAG_FILE
     fi
-    cat $FLAG_FILE
+    cat ${FLAG_FILE}
 }
 
 # Private: Query build properties independently what build system is used.
@@ -216,4 +216,55 @@ function getBuildProperty {
             echo $(getGradleProperty ${repo} ${gradleproperty})
         fi
     fi
+}
+
+
+# Private: Validate envelope using the PME injection
+#
+# $1 - ga group:artifact
+# $2 - version new version
+# $3 - build_log
+# $4 - root location
+# $5 - settings
+#
+# Examples
+#
+#   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "settings.xml" "true" "recipes"
+#
+# Returns the exit code of the last command executed.
+#
+function validate {
+    ga=$1
+    version=$2
+    build_log=$3
+    location=$4
+    settings=$5
+
+    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+    cd $location
+
+    mkdir -p $location/target
+    wget -q http://central.maven.org/maven2/org/commonjava/maven/ext/pom-manipulation-cli/2.12/pom-manipulation-cli-2.12.jar  \
+         -O $location/target/pom-manipulation-cli-2.12.jar
+
+    # ensure no leftovers are in place
+    git checkout -- pom.xml products/
+    [ -e $location/target/pom-manip-ext-marker.txt ] && rm $location/target/pom-manip-ext-marker.txt
+
+    # Manipulate
+    java -jar $location/target/pom-manipulation-cli-2.12.jar \
+            ${SETTINGS} \
+            -f pom.xml \
+            -DdependencyOverride.${ga}@*=${version} > ${build_log} 2>&1
+
+    # Validate envelope
+    mvn envelope:validate >> ${build_log} 2>&1
+    [ $? -eq 0 ] && status=${CTE_SUCCESS} || status=${CTE_WARNING}
+
+    # get rid of leftovers
+    git checkout -- pom.xml products/
+    rm $location/target/pom-manip-ext-marker.txt
+
+    echo $status
 }
