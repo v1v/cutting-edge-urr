@@ -434,7 +434,7 @@ EOT
 function envelopeMessage {
     if [ "$2" == "$CTE_WARNING" ] ; then
         echo $(cat << EOT
-        <span class="badge badge-pill badge-$1">envelope</span>
+        <span class="badge badge-pill badge-$2">envelope</span>
         <div class="card mb-3 mt-3 top-info-card">
             <div class="p-0" role="tab" id="envelopeHeading$1">
                 <a id="envelope-button$1" data-toggle="collapse" href="#envelope$1" aria-expanded="false" aria-controls="envelope$1" class="btn btn-warning btn-sm w-0 m-0 collapsed">

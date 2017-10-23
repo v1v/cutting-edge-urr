@@ -258,7 +258,7 @@ function validate {
             -DdependencyOverride.${ga}@*=${version} > ${build_log} 2>&1
 
     # Validate envelope
-    mvn envelope:validate >> ${build_log} 2>&1
+    mvn envelope:validate ${SETTINGS} >> ${build_log} 2>&1
     [ $? -eq 0 ] && status=${CTE_SUCCESS} || status=${CTE_WARNING}
 
     # get rid of leftovers
@@ -292,7 +292,9 @@ function pme {
     cd ${CURRENT}
 
     if [ -e ${PME} ] ; then
-        mvn install -f ${PME} | tee ${OUTPUT}
+        [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+        mvn install -f ${PME} ${SETTINGS} | tee ${OUTPUT}
 
         groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS})
         artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
@@ -307,7 +309,8 @@ function pme {
             -DversionSuffix=edge \
             -Ddebug \
             -Denforcer.skip \
-            -DdependencyManagement=${groupId}:${artifactId}:${version} | tee -a ${OUTPUT}
+            -DdependencyManagement=${groupId}:${artifactId}:${version} \
+            ${SETTINGS} | tee -a ${OUTPUT}
 
         build_status=$?
 
