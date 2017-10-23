@@ -302,3 +302,6 @@ done
 closeHTML ${HTML}
 closeJSON ${JSON}
 closePME  ${PME}
+
+# Run the PME stuff
+pme ${CURRENT} ${PME} "${EDGE}/pme.log" ${SETTINGS}

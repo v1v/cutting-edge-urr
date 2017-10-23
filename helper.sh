@@ -218,7 +218,6 @@ function getBuildProperty {
     fi
 }
 
-
 # Private: Validate envelope using the PME injection
 #
 # $1 - ga group:artifact
@@ -229,7 +228,7 @@ function getBuildProperty {
 #
 # Examples
 #
-#   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "settings.xml" "true" "recipes"
+#   validate "com.cloudbees:azure-cli" "1.2" "build.log" "./target" "settings.xml"
 #
 # Returns the exit code of the last command executed.
 #
@@ -267,4 +266,56 @@ function validate {
     rm $location/target/pom-manip-ext-marker.txt
 
     echo $status
+}
+
+# Private: Validate envelope and generate WAR plus the html diff
+#
+# $1 - root location
+# $2 - pme file
+# $3 - build output
+# $4 - settings
+#
+# Examples
+#
+#   pme "./" "pom.xml" "build.log" "settings.xml"
+#
+# Returns the exit code of the last command executed.
+#
+function pme {
+    CURRENT=$1
+    PME=$2
+    OUTPUT=$3
+    SETTINGS=$4
+
+    build_status=1
+
+    cd ${CURRENT}
+
+    if [ -e ${PME} ] ; then
+        mvn install -f ${PME} | tee ${OUTPUT}
+
+        groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS})
+        artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
+        version=$(getPomProperty ${PME} "project.version" ${SETTINGS})
+
+        ## Clean leftovers
+        git checkout -- pom.xml products/
+        rm ${CURRENT}/target/pom-manip-ext-marker.txt
+
+        mvn -B install \
+            -DversionSuffix=edge \
+            -Ddebug \
+            -Denforcer.skip \
+            -DdependencyManagement=${groupId}:${artifactId}:${version} | tee -a ${OUTPUT}
+
+        build_status=$?
+
+        # Generate html diff
+        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o target/diff.html
+
+        ## Clean leftovers
+        git checkout -- pom.xml products/
+        rm ${CURRENT}/target/pom-manip-ext-marker.txt
+    fi
+    echo $build_status
 }

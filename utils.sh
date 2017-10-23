@@ -424,7 +424,7 @@ EOT
 )
     else
         echo $(cat << EOT
-        <span class="badge badge-pill badge-$1">$2</span>
+        <span class="badge badge-pill badge-$2">$3</span>
 EOT
 )
     fi
