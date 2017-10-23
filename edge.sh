@@ -305,5 +305,6 @@ closePME  ${PME}
 
 # Run the PME stuff
 status=$(pme ${CURRENT} ${PME} "${EDGE}/pme.log" ${SETTINGS})
-
-exit $status
+pme=$?
+echo "Final PME stage - ${status}"
+exit $pme

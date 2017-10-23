@@ -230,3 +230,13 @@ EOT
     run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_FAILED}"
 }
+
+@test "Should cleanLeftOvers" {
+    run cleanLeftOvers "${TEMP_DIR}" "/dev/null"
+    assert_output ""
+    [ "$status" -eq 0 ]
+
+    run cleanLeftOvers "${TEMP_DIR}/1" "/dev/null"
+    assert_output ""
+    [ "$status" -eq 0 ]
+}

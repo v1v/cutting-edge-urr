@@ -242,33 +242,31 @@ function validate {
     location=$4
     settings=$5
 
+    TARGET=${location}/target
+
     [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
 
     cd $location
 
-    mkdir -p $location/target
+    mkdir -p $TARGET
     wget -q http://central.maven.org/maven2/org/commonjava/maven/ext/pom-manipulation-cli/2.12/pom-manipulation-cli-2.12.jar  \
-         -O $location/target/pom-manipulation-cli-2.12.jar
+         -O $TARGET/pom-manipulation-cli-2.12.jar
 
-    # ensure no leftovers are in place
-    git checkout -- pom.xml products/
-    [ -e $location/target/pom-manip-ext-marker.txt ] && rm $location/target/pom-manip-ext-marker.txt
+    cleanLeftOvers "${TARGET}" "${build_log}"
 
     # Manipulate
-    java -jar $location/target/pom-manipulation-cli-2.12.jar \
+    java -jar $TARGET/pom-manipulation-cli-2.12.jar \
             ${SETTINGS} \
             -f pom.xml \
             -DdependencyOverride.${ga}@*=${version} > ${build_log} 2>&1
 
     # Validate envelope
     mvn envelope:validate ${SETTINGS} >> ${build_log} 2>&1
-    [ $? -eq 0 ] && status=${CTE_SUCCESS} || status=${CTE_WARNING}
-
-    # get rid of leftovers
-    git checkout -- pom.xml products/
-    rm $location/target/pom-manip-ext-marker.txt
-
+    build_status=$?
+    [ $build_status -eq 0 ] && status=${CTE_SUCCESS} || status=${CTE_WARNING}
+    cleanLeftOvers "${TARGET}" "${build_log}"
     echo $status
+    return $build_status
 }
 
 # Private: Validate envelope and generate WAR plus the html diff
@@ -282,7 +280,7 @@ function validate {
 #
 #   pme "./" "pom.xml" "build.log" "settings.xml"
 #
-# Returns the exit code of the last command executed.
+# Returns the exit code PME execution if PME file exists otherwise errorlevel 1
 #
 function pme {
     CURRENT=$1
@@ -292,8 +290,8 @@ function pme {
 
     build_status=1
 
+    TARGET=${CURRENT}/target
     cd ${CURRENT}
-
     if [ -e ${PME} ] ; then
         [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
 
@@ -303,9 +301,7 @@ function pme {
         artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
         version=$(getPomProperty ${PME} "project.version" ${SETTINGS})
 
-        ## Clean leftovers
-        git checkout -- pom.xml products/
-        rm ${CURRENT}/target/pom-manip-ext-marker.txt
+        cleanLeftOvers $TARGET $OUTPUT
 
         set -o pipefail
         mvn -B install \
@@ -318,11 +314,24 @@ function pme {
         build_status=$?
 
         # Generate html diff
-        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o target/diff.html
+        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o ${TARGET}/diff.html >> ${OUTPUT} 2>&1
 
-        ## Clean leftovers
-        git checkout -- pom.xml products/
-        rm ${CURRENT}/target/pom-manip-ext-marker.txt
+        cleanLeftOvers $TARGET $OUTPUT
     fi
-    echo $build_status
+    [ $build_status -eq 0 ] && echo ${CTE_SUCCESS} || echo ${CTE_WARNING}
+    return $build_status
+}
+
+# Private: Remove PME generated files to allow rerun the same process without
+#           cleaning the entire target folder
+#
+# $1 - target location (normally <root folder>/target)
+# $2 - output file
+#
+function cleanLeftOvers {
+    TARGET=$1
+    OUTPUT=$2
+    ## Clean leftovers
+    git checkout -- pom.xml products/  >> ${OUTPUT} 2>&1
+    [ -e ${TARGET}/pom-manip-ext-marker.txt ] && rm ${TARGET}/pom-manip-ext-marker.txt  >> ${OUTPUT} 2>&1 || true
 }
