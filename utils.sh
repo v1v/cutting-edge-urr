@@ -267,9 +267,13 @@ function openHTML {
                 });
             });
         </script>
+        <script>
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+        </script>
     </head>
     <body>
-
         <header>
             <div class="container-fluid">
                 <div class="row-fluid">
@@ -284,8 +288,30 @@ function openHTML {
 
         <section id="summary">
             <div class="row-fluid">
-            <h1>URR Cutting Edge Report</h1>
+                <h1>URR Cutting Edge Report</h1>
+                <div class="mt-3 mb-3">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-expanded="true">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i> Badge legend
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="info" role="tabpanel" class="tab-pane fade p-3 active show" aria-labelledby="info-tab" aria-expanded="true">
+                            <div class="mb-1">
+                                <span class="badge badge-pill badge-default ml-1" data-toggle="tooltip" data-placement="top" title="This is the current version installed">current version</span>
+                                <span class="badge badge-pill badge-info ml-1" data-toggle="tooltip" data-placement="top" title="This is the new version to be installed">new version</span>
+                                <span class="badge badge-pill badge-success ml-1" data-toggle="tooltip" data-placement="top" title="Whether the build was successful or somethine else happens">status</span>
+                                <span class="badge badge-pill badge-info ml-1" data-toggle="tooltip" data-placement="top" title="Whether it has been validated from the envelope:validate goals">envelope</span>
+                                <span class="badge badge-pill badge-warning ml-1" data-toggle="tooltip" data-placement="top" title="What dependencies are required to be able to use this plugin">dependencies</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
+
         <section id="list">
             <div class="input-group col-xs-12">
                 <input id="search" type="text" class="form-control input-sm" placeholder="Search" />
@@ -377,7 +403,8 @@ EOT
 # Returns the exit code of the last command executed.
 #
 function li {
-    envelope=$(envelopeMessage "$1" "$6" "$7")
+    artifact=$(echo "$1" | cut -d":" -f2)
+    envelope=$(envelopeMessage "$artifact" "$6" "$7")
     cat <<EOT >> $8
     <li class="list-group-item justify-content-between ">
         $1
@@ -410,7 +437,7 @@ function envelopeMessage {
         <span class="badge badge-pill badge-$1">envelope</span>
         <div class="card mb-3 mt-3 top-info-card">
             <div class="p-0" role="tab" id="envelopeHeading$1">
-                <a id="envelope-button" data-toggle="collapse" href="#envelope$1" aria-expanded="false" aria-controls="envelope$1" class="btn btn-warning btn-sm w-0 m-0 collapsed">
+                <a id="envelope-button$1" data-toggle="collapse" href="#envelope$1" aria-expanded="false" aria-controls="envelope$1" class="btn btn-warning btn-sm w-0 m-0 collapsed">
                     <span class="ml-1">dependencies</span>
                 </a>
             </div>
