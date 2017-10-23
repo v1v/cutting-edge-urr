@@ -140,6 +140,15 @@ EOT
     assert_output 'git@github.com:cloudbees/cloudbees-aws-cli-plugin.git'
 }
 
+@test "Should return git+https when using public repos with git+git" {
+    run transform 'git://github.com/jenkinsci/project.git'
+    assert_output 'https://github.com/jenkinsci/project.git'
+    run transform 'git://github.com/jenkinsci/project'
+    assert_output 'https://github.com/jenkinsci/project'
+    run transform 'git://github.com/jenkinsci/project/asa'
+    assert_output 'https://github.com/jenkinsci/project'
+}
+
 @test "Should transform scm/connection urls" {
     run transform 'scm:git:git://github.com/user/repo.git'
     assert_output 'https://github.com/user/repo.git'

@@ -98,6 +98,9 @@ function transform {
     # Convert scm:git:git://github.com  and scm:git:git@github.com to https
     newurl=$(echo $url | sed -E 's#scm.*github.com(:|/)?#https://github.com/#')
 
+    # Convert git+git repos to git+https
+    newurl=$(echo $newurl | sed -E 's#git://github.com(:|/)?#https://github.com/#')
+
     # Convert repos to github.com/organisation/project
     newurl=$(echo $newurl | sed -Ene's#(.*github.com:?/?/?[^/]*/[^/]*).*#\1#p')
 
