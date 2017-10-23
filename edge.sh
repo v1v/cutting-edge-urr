@@ -239,7 +239,7 @@ index=1
 # Per unique dependency then let's build with latest
 find ${UNIQUE_POMS} -name *.pom -type f | sort | while read pom
 do
-    echo "\t${index} of ${total} unique pom files (${pom})"
+    echo "  ${index} of ${total} unique pom files (${pom})"
     cd ${CURRENT}
     repo="${EDGE}/$(basename ${pom})"
     effective=${pom}.effective
@@ -247,20 +247,20 @@ do
 
     # Get URL
     url=$(getURL ${pom} ${effective} "${repo}" "${OVERRIDE_FILE}" "${SETTINGS}")
-    echo "\t\t getURL stage - ${url}"
+    echo "     getURL stage - ${url}"
     # If it's found then
     if [ "$url" != "${CTE_UNREACHABLE}" -a "$url" != "${CTE_SCM}" ] ; then
         # Transform URL to be able to use it within rosie and also support multimodule maven projects
         url=$(transform $url)
-        echo "\t\t transform stage - ${url}"
+        echo "     transform stage - ${url}"
         repo="${EDGE}/$(basename ${url})"
         download=$(download ${url} ${repo})
-        echo "\t\t download stage - ${download}"
+        echo "     download stage - ${download}"
         if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
             build_log=${repo}.log
             description=$(buildDependency ${repo} ${build_log} ${SETTINGS} ${SKIP_TESTS} "${RECIPES_FOLDER}")
             newVersion=$(getBuildProperty  ${repo} "project.version" "version" "${SETTINGS}")
-            echo "\t\t buildDependency stage - ${description}"
+            echo "     buildDependency stage - ${description}"
             [ "${description}" == "${CTE_PASSED}" ] && state=${CTE_SUCCESS} || state=${CTE_WARNING}
         else
             description=${CTE_UNREACHABLE}
@@ -277,8 +277,8 @@ do
     version=$(getPomProperty ${effective} "project.version" ${SETTINGS})
 
     notify ${groupId} ${artifactId} ${version} ${newVersion} "${url}" ${state} ${description} ${HTML} ${JSON} ${PME}
-    echo "\t\t notify stage - ${state}"
-    echo "\t\t 'old GAV' - ${groupId}:${artifactId}:${version} 'new GAV' - ${groupId}:${artifactId}:${newVersion}"
+    echo "     notify stage - ${state}"
+    echo "     'old GAV' - ${groupId}:${artifactId}:${version} 'new GAV' - ${groupId}:${artifactId}:${newVersion}"
     let "index++"
 done
 
