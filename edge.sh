@@ -257,10 +257,9 @@ do
         download=$(download ${url} ${repo})
         echo "\t\t download stage - ${download}"
         if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
-            newVersion=$(get ${repo}/pom.xml "project.version" ${SETTINGS})
-            artifactId=$(get ${repo}/pom.xml "project.version" ${SETTINGS})
             build_log=${repo}.log
-            description=$(buildDependency ${repo} ${build_log} ${SETTINGS} ${SKIP_TESTS} ${artifactId} "${RECIPES_FOLDER}" )
+            description=$(buildDependency ${repo} ${build_log} ${SETTINGS} ${SKIP_TESTS} "${RECIPES_FOLDER}")
+            newVersion=$(getBuildProperty  ${repo} "project.version" "version" "${SETTINGS}")
             echo "\t\t buildDependency stage - ${description}"
             [ "${description}" == "${CTE_PASSED}" ] && state=${CTE_SUCCESS} || state=${CTE_WARNING}
         else
@@ -273,9 +272,9 @@ do
     fi
 
     # Get GAVC
-    groupId=$(get ${effective} "project.groupId" ${SETTINGS})
-    artifactId=$(get ${effective} "project.artifactId" ${SETTINGS})
-    version=$(get ${effective} "project.version" ${SETTINGS})
+    groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
+    artifactId=$(getPomProperty ${effective} "project.artifactId" ${SETTINGS})
+    version=$(getPomProperty ${effective} "project.version" ${SETTINGS})
 
     notify ${groupId} ${artifactId} ${version} ${newVersion} "${url}" ${state} ${description} ${HTML} ${JSON} ${PME}
     echo "\t\t notify stage - ${state}"

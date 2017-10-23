@@ -15,9 +15,9 @@ OUTPUT=target/urr.log
 if [ -e ${PME} ] ; then
     mvn install -f ${PME} | tee ${OUTPUT}
 
-    groupId=$(get ${PME} "project.groupId" ${SETTINGS})
-    artifactId=$(get ${PME} "project.artifactId" ${SETTINGS})
-    version=$(get ${PME} "project.version" ${SETTINGS})
+    groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS})
+    artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
+    version=$(getPomProperty ${PME} "project.version" ${SETTINGS})
 
     mvn -B install \
         -DversionSuffix=edge \

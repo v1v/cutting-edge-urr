@@ -25,13 +25,32 @@ CTE_UNREACHABLE="unreachable"
 #
 # Examples
 #
-#   get "pom.xml" "project.version"
+#   getPomProperty "pom.xml" "project.version"
 #
 # Returns the exit code of the last command executed.
 #
-function get {
+function getPomProperty {
     [ -f "$3" ] && SETTINGS="-s $3" || SETTINGS=""
     mvn -B help:evaluate -Dexpression=$2 -f $1 ${SETTINGS} | grep -e '^[^\[]' | grep -v 'INFO'
+}
+
+
+# Public: Get a particular property of a given Gradle repo.
+#
+# Takes an expression and it evaluates within a particular POM file..
+#
+# $1 - Gradle repo.
+# $2 - expression to be evaluated.
+#
+# Examples
+#
+#   getGradleProperty "build.gradle" "version"
+#
+# Returns the exit code of the last command executed.
+#
+function getGradleProperty {
+    repo=$1
+    ${repo}/gradlew -b ${repo}/build.gradle properties | grep $2 | cut -d":" -f2 | tr -d " "
 }
 
 # Public: Get a particular XML property of a given POM file.

@@ -46,7 +46,7 @@ function getURL {
     mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} >>${build_log} 2>&1
 
     # Get effective artifact
-    artifactId=$(get ${effective} "project.artifactId" ${settings})
+    artifactId=$(getPomProperty ${effective} "project.artifactId" ${settings})
 
     # Override?
     url=$(getOverridedProperty ${override} url.${artifactId})
@@ -149,14 +149,13 @@ function download {
 # $2 - build_log
 # $3 - settings
 # $4 - skip_tests
-# $5 - artifactid
-# $6 - recipes folder
+# $5 - recipes folder
 #
 # Uses CTE variables
 #
 # Examples
 #
-#   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "settings.xml" "true" "azure" "recipes"
+#   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "settings.xml" "true" "recipes"
 #
 # Returns the exit code of the last command executed.
 #
@@ -165,12 +164,16 @@ function buildDependency {
     build_log=$2
     settings=$3
     skip=$4
-    artifactId=$5
-    recipes=$6
+    recipes=$5
 
     FLAG_FILE=".status.flag"
     MAVEN_FLAGS="-DskipTests=${skip} -Dfindbugs.skip=${skip} -Dmaven.test.skip=${skip} -Dmaven.javadoc.skip=true"
     cd ${repo}
+
+    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+    artifactId=$(getBuildProperty  ${repo} "project.artifactId" "name" "${settings}")
+
     # Cache previous build executions
     if [ ! -e $FLAG_FILE ] ; then
         override_file="${recipes}/${artifactId}.build"
@@ -179,10 +182,38 @@ function buildDependency {
         else
             build_command="mvn -e -V -B -ff clean install ${MAVEN_FLAGS} -T 1C ${SETTINGS}"
         fi
-        [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-        ${build_command} >>${build_log} 2>&1
+        ${build_command} >> ${build_log} 2>&1
         [ $? -eq 0 ] && status=${CTE_PASSED} || status=${CTE_FAILED}
         echo $status > $FLAG_FILE
     fi
     cat $FLAG_FILE
+}
+
+# Private: Query build properties independently what build system is used.
+#           Supported Maven and Gradle so far
+#
+# $1 - repo folder
+# $2 - pom property
+# $3 - gradle property
+# $4 - settings
+#
+# Examples
+#
+#   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "settings.xml" "true" "recipes"
+#
+# Returns the exit code of the last command executed.
+#
+function getBuildProperty {
+    repo=$1
+    pomproperty=$2
+    gradleproperty=$3
+    settings=$4
+
+    if [ -e ${repo}/pom.xml ] ; then
+        echo $(getPomProperty ${repo}/pom.xml ${pomproperty} ${settings})
+    else
+        if [ -e ${repo}/build.gradle ] ; then
+            echo $(getGradleProperty ${repo} ${gradleproperty})
+        fi
+    fi
 }

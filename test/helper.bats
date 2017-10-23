@@ -162,37 +162,62 @@ EOT
 
 @test "Should buildDependency" {
     download https://github.com/dantheman213/java-hello-world-maven.git "${TEMP_DIR_NEW}"
-    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "~/.m2/settings.xml" true
+    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_PASSED}"
     echo "passed" > "${TEMP_DIR_NEW}/.status.flag"
-    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "~/.m2/settings.xml" true
+    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_PASSED}"
     echo "failed" > "${TEMP_DIR_NEW}/.status.flag"
-    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "~/.m2/settings.xml" true
+    run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_FAILED}"
 }
 
-@test "Should buildDependency with override options for gradle and some customised builds" {
-    download https://github.com/jenkinsci/gradle-plugin.git "${TEMP_DIR_NEW}/gradle-plugin"
-    cat <<EOT > ${TEMP_DIR}/gradle.build
-[build]
-    command = ./gradlew tasks
-EOT
-    run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "~/.m2/settings.xml" "true" "gradle" "${TEMP_DIR}"
-    assert_output "${CTE_PASSED}"
-
+@test "Should buildDependency with override options for some maven customised builds" {
     download https://github.com/dantheman213/java-hello-world-maven.git "${TEMP_DIR_NEW}/maven"
     cat <<EOT > ${TEMP_DIR}/myapp.build
 [build]
     command = mvn --help
 EOT
-    run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "~/.m2/settings.xml" "true" "myapp" "${TEMP_DIR}"
+    run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
 
+    # This is cached
     cat <<EOT > ${TEMP_DIR}/myapp.build
 [build]
     command = mvn axz
 EOT
-    run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "~/.m2/settings.xml" "true" "myapp" "${TEMP_DIR}"
+    run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
+    assert_output "${CTE_PASSED}"
+
+    # remove cached flag
+    rm ${TEMP_DIR_NEW}/maven/.status.flag
+    cat <<EOT > ${TEMP_DIR}/myapp.build
+[build]
+    command = mvn axz
+EOT
+    run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
+    assert_output "${CTE_FAILED}"
+}
+
+@test "Should buildDependency with override options for gradle customised builds" {
+    download https://github.com/jenkinsci/gradle-plugin.git "${TEMP_DIR_NEW}/gradle-plugin"
+    cat <<EOT > ${TEMP_DIR}/gradle-plugin.build
+[build]
+    command = ./gradlew tasks
+EOT
+    run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
+    assert_output "${CTE_PASSED}"
+
+    cat <<EOT > ${TEMP_DIR}/gradle-plugin.build
+[build]
+    command = ./xyz
+EOT
+    # This is cached
+    run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
+    assert_output "${CTE_PASSED}"
+
+    # This is cached
+    rm ${TEMP_DIR_NEW}/gradle-plugin/.status.flag
+    run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_FAILED}"
 }

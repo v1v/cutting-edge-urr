@@ -13,6 +13,7 @@ setup() {
     export LI_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export WRONG_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+    export TEMP_DIR=$(mktemp -d /tmp/bats.XXXXXXXXXX)
     cat <<EOT > $POM_FILE
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -62,6 +63,7 @@ teardown() {
     rm ${EMPTY_FILE}
     rm ${POM_FILE}
     rm ${WRONG_POM_FILE}
+    rm -rf ${TEMP_DIR}
 }
 
 @test "Should parse GitHub if GitHub URLs" {
@@ -112,7 +114,6 @@ EOT
     assert_output ''
 }
 
-
 @test "Should add li element" {
     li "name" "default" "info" "badge" "description" $TEMP_FILE
     run diff $LI_FILE $TEMP_FILE
@@ -131,15 +132,29 @@ EOT
     assert_output ''
 }
 
-@test "Should get property given a pom" {
-    run get $POM_FILE "project.version"
+@test "Should getPomProperty property given a pom" {
+    run getPomProperty $POM_FILE "project.version"
     assert_output 'version'
 
-    run get $POM_FILE "project.version1"
+    run getPomProperty $POM_FILE "project.version1"
     assert_output 'null object or invalid expression'
 
-    run get $WRONG_POM_FILE "project.version"
+    run getPomProperty $WRONG_POM_FILE "project.version"
     refute_output 'version'
+}
+
+@test "Should getGradleProperty property given gradle project" {
+    source helper.sh
+    download https://github.com/jenkinsci/gradle-plugin.git "${TEMP_DIR}/gradle-plugin"
+
+    run getGradleProperty ${TEMP_DIR}/gradle-plugin "name"
+    assert_output 'gradle-plugin'
+
+    run getGradleProperty ${TEMP_DIR}/gradle-plugin "unknown"
+    assert_output ''
+
+    run getGradleProperty $WRONG_POM_FILE "name"
+    refute_output 'gradle-plugin'
 }
 
 @test "Should get getXMLProperty given a pom" {
