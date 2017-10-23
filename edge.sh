@@ -304,4 +304,6 @@ closeJSON ${JSON}
 closePME  ${PME}
 
 # Run the PME stuff
-pme ${CURRENT} ${PME} "${EDGE}/pme.log" ${SETTINGS}
+status=$(pme ${CURRENT} ${PME} "${EDGE}/pme.log" ${SETTINGS})
+
+exit $status

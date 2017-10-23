@@ -302,6 +302,7 @@ function pme {
         git checkout -- pom.xml products/
         rm ${CURRENT}/target/pom-manip-ext-marker.txt
 
+        set -o pipefail
         mvn -B install \
             -DversionSuffix=edge \
             -Ddebug \
