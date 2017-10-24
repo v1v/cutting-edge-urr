@@ -477,7 +477,7 @@ EOT
 # Returns the exit code of the last command executed.
 #
 function addDependency {
-    if [[ $4 == *.xml ]] ; then
+    if [[ $4 == *.xml || $4 == *.pme ]] ; then
         echo "<dependency><groupId>$1</groupId><artifactId>$2</artifactId><version>$3</version></dependency>" >> $4
     fi
 }

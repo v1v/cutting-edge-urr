@@ -60,7 +60,7 @@ EOT
 }
 
 teardown() {
-    rm ${TEMP_FILE}
+    rm ${TEMP_FILE}*
     rm ${JSON_FILE}
     rm ${DEPENDENCY_FILE}
     rm ${LI_FILE}
@@ -125,6 +125,10 @@ EOT
     # With the xml extension
     addDependency "group" "artifact" "version" ${TEMP_FILE}.xml
     run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.xml
+    assert_output ''
+    # With the pme extension
+    addDependency "group" "artifact" "version" ${TEMP_FILE}.pme
+    run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.pme
     assert_output ''
 }
 

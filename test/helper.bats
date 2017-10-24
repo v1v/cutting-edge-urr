@@ -56,29 +56,29 @@ teardown() {
 
 @test "Should return URL when queering Maven plugin" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/maven-plugin/maven-plugin-3.0/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "http://github.com/jenkinsci/maven-plugin"
 }
 
 @test "Should return overrided_url when quering ANT plugin in an existing override file" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/ant-plugin/ant-1.7/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "overrided_url"
 }
 
 @test "Should return unreachalbe when quering ace-editor plugin " {
     wget -q "https://raw.githubusercontent.com/jenkinsci/js-libs/master/ace-editor/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output ${CTE_UNREACHABLE}
 }
 
 @test "Should return scm when quering POM without SCM " {
-    run getURL ${NO_SCM_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${NO_SCM_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output ${CTE_SCM}
 }
 
 @test "Should return connection URL when quering POM scm " {
-    run getURL ${CONNECTION_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${CONNECTION_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "git://github.com/jenkinsci/gradle-plugin.git"
 }
 
