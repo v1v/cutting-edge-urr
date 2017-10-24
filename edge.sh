@@ -134,7 +134,7 @@ validate_arguments() {
         echo "WRONG: excludeGroupIds file doesn't exist" ; exit 1
     else
         if [ -n "$EXCLUDE_GROUPS_FILE" ] ; then
-            if [  -n "$EXCLUDE_GROUPS_FILE" -o `cat $EXCLUDE_GROUPS_FILE | wc -l` -gt 1  ] ; then
+            if [ `cat $EXCLUDE_GROUPS_FILE | wc -l` -gt 1  ] ; then
                 echo "WRONG: excludeGroupIds file cannot contains multilines" ; exit 1
             fi
         fi
