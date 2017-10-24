@@ -31,3 +31,9 @@ Bash script tested it out in :
 * Gradle plugin is causing some infinite loops.
 * GetURL function doesn't solve git+protocol:/organisation/project/submodule since it's solved in the
     transform phase.
+
+## TODO
+
+* Validate required tools
+* jq
+

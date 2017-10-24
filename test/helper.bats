@@ -12,6 +12,10 @@ setup() {
     export NO_SCM_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export CONNECTION_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export TEMP_DIR_NEW=${TEMP_DIR}.new
+    export JSON_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+    export ENVELOPE_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+    export DIFFERENT_VERSION_JSON_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+
     cat <<EOT > $OVERRIDE_FILE
 [url]
     ant = overrided_url
@@ -42,6 +46,10 @@ EOT
 </project>
 EOT
 
+    # Using templates
+    cp */resource/verify/dependencies.json $JSON_FILE
+    cp */resource/verify/envelope.json $ENVELOPE_FILE
+    cp */resource/verify/different_version_dependencies.json $DIFFERENT_VERSION_JSON_FILE
 }
 
 teardown() {
@@ -52,6 +60,9 @@ teardown() {
     rm ${NO_SCM_POM_FILE}
     rm ${CONNECTION_POM_FILE}
     rm $EFFECTIVE_FILE
+    rm ${JSON_FILE}
+    rm ${ENVELOPE_FILE}
+    rm ${DIFFERENT_VERSION_JSON_FILE}
 }
 
 @test "Should return URL when queering Maven plugin" {
@@ -240,3 +251,50 @@ EOT
     assert_output ""
     [ "$status" -eq 0 ]
 }
+
+@test "Should not verify when no files" {
+    run verify "" ""
+    assert_output "${CTE_WARNING}"
+    [ "$status" -eq 1 ]
+
+    run verify "foo" "bar"
+    assert_output "${CTE_WARNING}"
+    [ "$status" -eq 1 ]
+
+    run verify "" "bar"
+    assert_output "${CTE_WARNING}"
+    [ "$status" -eq 1 ]
+
+    run verify "foo" ""
+    assert_output "${CTE_WARNING}"
+    [ "$status" -eq 1 ]
+
+    run verify "${JSON_FILE}" "${ENVELOPE_FILE}"
+    assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
+}
+
+@test "Should verify when files" {
+    run verify "${JSON_FILE}" "${ENVELOPE_FILE}"
+    assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
+
+    run verify "${DIFFERENT_VERSION_JSON_FILE}" "${ENVELOPE_FILE}"
+    assert_output "org.jenkins-ci.plugins:active-directory envelope-version '2.7-SNAPSHOT' doesn't match pme-version '1.2-SNAPSHOT'"
+    [ "$status" -eq 1 ]
+}
+
+@test "Should getJsonPropertyFromEnvelope" {
+    run getJsonPropertyFromEnvelope 'credentials' 'groupId' $ENVELOPE_FILE
+    assert_output "org.jenkins-ci.plugins"
+    [ "$status" -eq 0 ]
+
+    run getJsonPropertyFromEnvelope 'credentials' 'wrong' $ENVELOPE_FILE
+    assert_output "null"
+    [ "$status" -eq 0 ]
+
+    run getJsonPropertyFromEnvelope 'key' 'groupId' $ENVELOPE_FILE
+    assert_output "null"
+    [ "$status" -eq 0 ]
+}
+

@@ -339,3 +339,63 @@ function cleanLeftOvers {
     git checkout -- pom.xml products/  >> ${OUTPUT} 2>&1
     [ -e ${TARGET}/pom-manip-ext-marker.txt ] && rm ${TARGET}/pom-manip-ext-marker.txt  >> ${OUTPUT} 2>&1 || true
 }
+
+
+# Public: Verify whether the final dependencies.json and envelope.json match.
+#          Each element from the envelope.json should match with the dependencies.json
+#           While each dependencies.json element might not match
+#
+# $1 - dependencies json
+# $2 - envelope.json (root location: ./products/*/target/*/WEB-INF/plugins/envelope.json)
+#
+# Returns whether PME dependencies have been injected accordingly. Otherwise errorlevel 1 and
+# echo each broken dependency
+#
+function verify {
+    jsonFile=$1
+    envelopeFile=$2
+
+    status=0
+    if [ ! -e "$jsonFile" -o ! -e "$envelopeFile" ] ; then
+        status=1
+        echo $CTE_WARNING
+    else
+        # For each element in the dependencies.json file
+        for row in $(cat ${jsonFile} | jq -r '.[] | @base64'); do
+            _jq() {
+                echo ${row} | base64 --decode | jq -r ${1}
+            }
+            envelope=$(_jq '.envelope')
+            if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
+                groupId=$(_jq '.groupId')
+                artifactId=$(_jq '.artifactId')
+                newVersion=$(_jq '.newVersion')
+                envelopeVersion=$(getJsonPropertyFromEnvelope $artifactId 'version' $envelopeFile)
+                if [ "$newVersion" != "${envelopeVersion}" ] ; then
+                    status=1
+                    echo "${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'"
+                fi
+            fi
+        done
+        [ $status -eq 0 ] && echo $CTE_PASSED || true
+    fi
+    return $status
+}
+
+# Private: Given a particular envelope.json file and artifactId gets that particular property
+#          Each element from the envelope.json should match with the dependencies.json
+#           While each dependencies.json element might not match
+#
+# $1 - artifactId
+# #2 - property
+# $3 - envelope.json
+#
+# Returns the exit code of the last command executed. And echo the property value
+#
+function getJsonPropertyFromEnvelope {
+    artifactId=$1
+    property=$2
+    envelope=$3
+    echo $(cat ${envelope} | jq ".plugins[\"${artifactId}\"].${property}") | sed 's#"##g'
+}
+

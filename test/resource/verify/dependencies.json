@@ -1,0 +1,49 @@
+[
+    {
+        "groupId": "org.jenkins-ci.plugins",
+        "artifactId": "active-directory",
+        "version": "2.4",
+        "newVersion": "2.7-SNAPSHOT",
+        "url": "https://github.com/jenkinsci/active-directory-plugin",
+        "status": "success",
+        "description": "passed",
+        "envelope": "success",
+        "validate": "validated"
+    },
+    {
+        "groupId": "org.jenkins-ci.plugins",
+        "artifactId": "ant",
+        "version": "1.7",
+        "newVersion": "1.8-SNAPSHOT",
+        "url": "https://github.com/jenkinsci/ant-plugin.git",
+        "status": "success",
+        "description": "passed",
+        "envelope": "success",
+        "validate": "validated"
+    },
+    {
+        "groupId": "org.jenkins-ci.plugins",
+        "artifactId": "promoted-builds",
+        "version": "2.29",
+        "newVersion": "2.32-SNAPSHOT",
+        "url": "https://github.com/jenkinsci/promoted-builds-plugin",
+        "status": "success",
+        "description": "passed",
+        "envelope": "warning",
+        "validate": [
+            "Dependency [maven-plugin/3.0] needed but version [2.14] provided",
+            "Dependency [apache-httpcomponents-client-4-api/4.5.3-2.0] not found in scope [fat] or lower"
+        ]
+    },
+    {
+        "groupId": "com.cloudbees.operations-center.server",
+        "artifactId": "operations-center-embedded-elasticsearch",
+        "version": "2.73.0.1",
+        "newVersion": "",
+        "url": "git@github.com:cloudbees/operations-center-embedded-elasticsearch.git",
+        "status": "warning",
+        "description": "failed",
+        "envelope": "none",
+        "validate": "none"
+    }
+]

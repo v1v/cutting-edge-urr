@@ -319,4 +319,19 @@ closePME  ${PME}
 status=$(pme ${CURRENT} ${PME} "${EDGE}/pme.log" ${SETTINGS})
 pme=$?
 echo "Final PME stage - ${status}"
+
+# Verify PME vs each Envelope only if PME execution was success
+if [ $pme -eq 0 ] ; then
+    find . -name envelope.json -type f -not -path "**/generated-resources/*" | sort | while read envelope
+    do
+        verify ${JSON} ${envelope}
+        if [ $? -ne 0 ] ; then
+            pme=1
+        else
+            echo "Verified $(basename $envelope)"
+        fi
+    done
+fi
+
 exit $pme
+
