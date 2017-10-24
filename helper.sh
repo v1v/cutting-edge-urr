@@ -251,8 +251,10 @@ function validate {
     cd $location
 
     mkdir -p $TARGET
-    wget -q http://central.maven.org/maven2/org/commonjava/maven/ext/pom-manipulation-cli/2.12/pom-manipulation-cli-2.12.jar  \
-         -O $TARGET/pom-manipulation-cli-2.12.jar
+    if [ ! -e $TARGET/pom-manipulation-cli-2.12.jar ] ; then
+        wget -q http://central.maven.org/maven2/org/commonjava/maven/ext/pom-manipulation-cli/2.12/pom-manipulation-cli-2.12.jar  \
+             -O $TARGET/pom-manipulation-cli-2.12.jar
+    fi
 
     cleanLeftOvers "${TARGET}" "${build_log}"
 
