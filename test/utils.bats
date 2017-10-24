@@ -2,6 +2,7 @@
 
 load 'libs/bats-support/load'
 load 'libs/bats-assert/load'
+load 'libs/bats-file/load'
 
 setup() {
     source utils.sh
@@ -106,33 +107,56 @@ EOT
 }
 
 @test "Should add json element" {
-    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "validate" $TEMP_FILE
+    # Without the json extension
+    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "validate" ${TEMP_FILE}
     run diff $JSON_FILE $TEMP_FILE
+    refute_output ''
+    # With the json extension
+    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "validate" ${TEMP_FILE}.json
+    run diff -w $JSON_FILE ${TEMP_FILE}.json
     assert_output ''
 }
 
 @test "Should add pom dependency" {
+    # Without the xml extension
     addDependency "group" "artifact" "version" $TEMP_FILE
     run diff $DEPENDENCY_FILE $TEMP_FILE
+    refute_output ''
+    # With the xml extension
+    addDependency "group" "artifact" "version" ${TEMP_FILE}.xml
+    run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.xml
     assert_output ''
 }
 
 @test "Should add li element" {
+    # Without the html extension
     li "name" "default" "info" "badge" "description" "envelope" "validate" $TEMP_FILE
     run diff $LI_FILE $TEMP_FILE
+    refute_output ''
+    # With the html extension
+    li "name" "default" "info" "badge" "description" "envelope" "validate" ${TEMP_FILE}.html
+    run diff -w $LI_FILE ${TEMP_FILE}.html
     assert_output ''
 }
 
 @test "Should generate dependency when status is success" {
-    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" $TEMP_FILE
-    run diff $DEPENDENCY_FILE $TEMP_FILE
+    # Without the xml extension
+    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}
+    run diff $DEPENDENCY_FILE ${TEMP_FILE}
+    refute_output ''
+    # With the xml extension
+    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml
+    run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.xml
     assert_output ''
 }
 
 @test "Should not generate dependency when status is not success" {
-    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" $TEMP_FILE
-    run diff $EMPTY_FILE $TEMP_FILE
-    assert_output ''
+    # Without the xml extension
+    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" ${TEMP_DIR}/new
+    assert_file_not_exist ${TEMP_DIR}/new
+    # With the xml extension
+    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml
+    assert_file_not_exist ${TEMP_FILE}.xml
 }
 
 @test "Should getPomProperty property given a pom" {

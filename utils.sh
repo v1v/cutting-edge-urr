@@ -82,7 +82,9 @@ function getXMLProperty {
 # Returns the exit code of the last command executed.
 #
 function getOverridedProperty {
-    git config --file=$1 --get $2
+    if [ -e $1 ] ; then
+        git config --file=$1 --get $2
+    fi
 }
 
 # Public: Notify other reporting functions
@@ -403,21 +405,22 @@ EOT
 # Returns the exit code of the last command executed.
 #
 function li {
-    artifact=$(echo "$1" | cut -d":" -f2)
-    envelope=$(envelopeMessage "$artifact" "$6" "$7")
-    cat <<EOT >> $8
-    <li class="list-group-item justify-content-between ">
-        $1
-        <div class="hidden-xs-down">
-            <span class="badge badge-pill badge-default">$2</span>
-            <span class="badge badge-pill badge-info">$3</span>
-            <span class="badge badge-pill badge-$4">$5</span>
-            ${envelope}
-        </div>
-    </li>
+    if [[ $8 == *.html ]] ; then
+        artifact=$(echo "$1" | cut -d":" -f2)
+        envelope=$(envelopeMessage "$artifact" "$6" "$7")
+        cat <<EOT >> $8
+        <li class="list-group-item justify-content-between ">
+            $1
+            <div class="hidden-xs-down">
+                <span class="badge badge-pill badge-default">$2</span>
+                <span class="badge badge-pill badge-info">$3</span>
+                <span class="badge badge-pill badge-$4">$5</span>
+                ${envelope}
+            </div>
+        </li>
 EOT
+    fi
 }
-
 
 # Private: Add envelope message
 #
@@ -474,7 +477,9 @@ EOT
 # Returns the exit code of the last command executed.
 #
 function addDependency {
-    echo "<dependency><groupId>$1</groupId><artifactId>$2</artifactId><version>$3</version></dependency>" >> $4
+    if [[ $4 == *.xml ]] ; then
+        echo "<dependency><groupId>$1</groupId><artifactId>$2</artifactId><version>$3</version></dependency>" >> $4
+    fi
 }
 
 # Public: Add JSON dependency.
@@ -500,19 +505,21 @@ function addDependency {
 # Returns the exit code of the last command executed.
 #
 function addJSONDependency {
-    cat <<EOT >> ${10}
-{
-    "groupId": "$1",
-    "artifactId": "$2",
-    "version": "$3",
-    "newVersion": "$4",
-    "url": "$5",
-    "status": "$6",
-    "description": "$7",
-    "envelope": "$8",
-    "validate": "$9"
-},
+    if [[ ${10} == *.json ]] ; then
+        cat <<EOT >> ${10}
+    {
+        "groupId": "$1",
+        "artifactId": "$2",
+        "version": "$3",
+        "newVersion": "$4",
+        "url": "$5",
+        "status": "$6",
+        "description": "$7",
+        "envelope": "$8",
+        "validate": "$9"
+    },
 EOT
+    fi
 }
 
 # Public: Get rid of the packaging hpi issue when no parent POM
