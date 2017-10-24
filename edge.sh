@@ -78,6 +78,7 @@
 #		xmlstarlet binary
 #		maven 3.3+
 #		git 2+
+#		jq
 #
 # KNOWN ISSUES:
 #
@@ -144,6 +145,15 @@ validate_arguments() {
     fi
 }
 
+validate_dependencies() {
+    for tool in jq java mvn git xmlstarlet; do
+        if ! command -v ${tool} ; then
+            echo "MISSING ${tool}"
+            exit 1
+        fi
+    done
+}
+
 # Public: Maven settings.xml file to be used, file path based.
 SETTINGS=
 # Public: Properties file with a list of key=url tuples (key -> groupId.artifactId=https://)
@@ -190,7 +200,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 validate_arguments
-
+validate_dependencies
 ###############################################################################
 
 function initialise {
