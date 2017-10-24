@@ -283,25 +283,25 @@ function validate {
 # Returns the exit code PME execution if PME file exists otherwise errorlevel 1
 #
 function pme {
-    CURRENT=$1
+    location=$1
     PME=$2
-    OUTPUT=$3
-    SETTINGS=$4
+    output=$3
+    settings=$4
 
     build_status=1
 
-    TARGET=${CURRENT}/target
-    cd ${CURRENT}
+    target=${location}/target
+    cd ${location}
     if [ -e ${PME} ] ; then
         [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
 
-        mvn install -f ${PME} ${SETTINGS} | tee ${OUTPUT}
+        mvn install -f ${PME} ${SETTINGS} >> ${output} 2>&1
 
         groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS})
         artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
         version=$(getPomProperty ${PME} "project.version" ${SETTINGS})
 
-        cleanLeftOvers $TARGET $OUTPUT
+        cleanLeftOvers $target $output
 
         set -o pipefail
         mvn -B install \
@@ -309,14 +309,14 @@ function pme {
             -Ddebug \
             -Denforcer.skip \
             -DdependencyManagement=${groupId}:${artifactId}:${version} \
-            ${SETTINGS} | tee -a ${OUTPUT}
+            ${SETTINGS} >> ${output} 2>&1
 
         build_status=$?
 
         # Generate html diff
-        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o ${TARGET}/diff.html >> ${OUTPUT} 2>&1
+        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o ${target}/diff.html >> ${output} 2>&1
 
-        cleanLeftOvers $TARGET $OUTPUT
+        cleanLeftOvers $target $output
     fi
     [ $build_status -eq 0 ] && echo ${CTE_SUCCESS} || echo ${CTE_WARNING}
     return $build_status

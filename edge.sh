@@ -293,7 +293,7 @@ do
     # Get GAVC
     version=$(getPomProperty ${effective} "project.version" ${SETTINGS})
 
-    notify ${groupId} ${artifactId} ${version} ${newVersion} "${url}" "${state}" "${description}" "${envelope}" "${message}" ${HTML} ${JSON} ${PME}
+    notify "${groupId}" "${artifactId}" "${version}" "${newVersion}" "${url}" "${state}" "${description}" "${envelope}" "${message}" "${HTML}" "${JSON}" "${PME}"
     echo "     notify stage - ${state}"
     echo "     'old GAV' - ${groupId}:${artifactId}:${version} 'new GAV' - ${groupId}:${artifactId}:${newVersion}"
     let "index++"
