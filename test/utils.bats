@@ -115,6 +115,25 @@ EOT
     addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "validate" ${TEMP_FILE}.json
     run diff -w $JSON_FILE ${TEMP_FILE}.json
     assert_output ''
+
+    # Multiline
+    cat <<EOT > $TEMP_FILE
+{
+    "groupId": "group",
+    "artifactId": "artifact",
+    "version": "version",
+    "newVersion": "newversion",
+    "url": "url",
+    "status": "status",
+    "description": "description",
+    "envelope": "envelope",
+    "validate": "dep0|dep1"
+},
+EOT
+    rm ${TEMP_FILE}.json
+    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "dep0\ndep1" ${TEMP_FILE}.json
+    run diff -w $TEMP_FILE ${TEMP_FILE}.json
+    assert_output ''
 }
 
 @test "Should add pom dependency" {
