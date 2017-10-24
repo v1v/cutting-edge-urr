@@ -31,7 +31,7 @@ CTE_UNREACHABLE="unreachable"
 #
 function getPomProperty {
     [ -f "$3" ] && SETTINGS="-s $3" || SETTINGS=""
-    mvn -B help:evaluate -Dexpression=$2 -f $1 ${SETTINGS} | grep -e '^[^\[]' | grep -v 'INFO'
+    mvn -B help:evaluate -Dexpression=$2 -f $1 ${SETTINGS} 2>/dev/null | grep -e '^[^\[]' | grep -v 'INFO'
 }
 
 
@@ -50,7 +50,7 @@ function getPomProperty {
 #
 function getGradleProperty {
     repo=$1
-    ${repo}/gradlew -b ${repo}/build.gradle properties | grep $2 | cut -d":" -f2 | tr -d " "
+    ${repo}/gradlew -b ${repo}/build.gradle properties 2>/dev/null | grep $2 | cut -d":" -f2 | tr -d " "
 }
 
 # Public: Get a particular XML property of a given POM file.

@@ -191,6 +191,11 @@ EOT
 
     run getPomProperty $WRONG_POM_FILE "project.version"
     refute_output 'version'
+
+    export _JAVA_OPTIONS="-Xmx1g"
+    run getPomProperty $WRONG_POM_FILE "project.version"
+    refute_output '_JAVA_OPTIONS'
+    unset _JAVA_OPTIONS
 }
 
 @test "Should getGradleProperty property given gradle project" {
@@ -205,6 +210,11 @@ EOT
 
     run getGradleProperty $WRONG_POM_FILE "name"
     refute_output 'gradle-plugin'
+
+    export _JAVA_OPTIONS="-Xmx1g"
+    run getGradleProperty ${TEMP_DIR}/gradle-plugin "name"
+    refute_output '_JAVA_OPTIONS'
+    unset _JAVA_OPTIONS
 }
 
 @test "Should get getXMLProperty given a pom" {

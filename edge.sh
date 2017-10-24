@@ -78,6 +78,7 @@
 #		xmlstarlet binary
 #		maven 3.3+
 #		git 2+
+#		jq
 #
 # KNOWN ISSUES:
 #
@@ -144,6 +145,15 @@ validate_arguments() {
     fi
 }
 
+validate_dependencies() {
+    for tool in jq java mvn git xmlstarlet; do
+        if ! command -v ${tool} ; then
+            echo "MISSING ${tool}"
+            exit 1
+        fi
+    done
+}
+
 # Public: Maven settings.xml file to be used, file path based.
 SETTINGS=
 # Public: Properties file with a list of key=url tuples (key -> groupId.artifactId=https://)
@@ -190,7 +200,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 validate_arguments
-
+validate_dependencies
 ###############################################################################
 
 function initialise {
@@ -325,15 +335,17 @@ if [ $pme -eq 0 ] ; then
     skipNullable=true
     find . -name envelope.json -type f -not -path "**/generated-resources/*" -not -path "**/test/resource/*" | sort | while read envelope
     do
-        echo "Verifying $(dirname $envelope)"
+        echo -n "     Verifying $(dirname $envelope)"
         verify ${JSON} ${envelope} ${skipNullable}
         if [ $? -ne 0 ] ; then
             pme=1
+            echo "     - failed"
         else
-            echo "Verified $(dirname $envelope)"
+            echo "     - verified"
         fi
     done
 fi
 
+echo "Verify stage - ${pme}"
 exit $pme
 
