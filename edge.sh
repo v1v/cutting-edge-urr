@@ -147,7 +147,7 @@ validate_arguments() {
 
 validate_dependencies() {
     for tool in jq java mvn git xmlstarlet; do
-        if ! command -v ${tool} ; then
+        if ! command -v ${tool} >/dev/null ; then
             echo "MISSING ${tool}"
             exit 1
         fi
@@ -333,15 +333,14 @@ echo "Final PME stage - ${status}"
 # Verify PME vs each Envelope only if PME execution was success
 if [ $pme -eq 0 ] ; then
     skipNullable=true
-    find . -name envelope.json -type f -not -path "**/generated-resources/*" -not -path "**/test/resource/*" | sort | while read envelope
+    find . -name envelope.json -type f -not -path "**/generated-resources/*" -not -path "**/test/resource/*" | sort | while read file
     do
-        echo -n "     Verifying $(dirname $envelope)"
-        verify ${JSON} ${envelope} ${skipNullable}
+        verify ${JSON} ${file} ${skipNullable}
         if [ $? -ne 0 ] ; then
             pme=1
-            echo "     - failed"
+            echo "     Verifying $file - failed"
         else
-            echo "     - verified"
+            echo "     Verifying $file - passed"
         fi
     done
 fi

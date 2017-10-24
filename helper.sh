@@ -390,7 +390,6 @@ function verify {
                 fi
             fi
         done
-        [ $status -eq 0 ] && echo $CTE_PASSED || true
     fi
     return $status
 }

@@ -270,13 +270,13 @@ EOT
     [ "$status" -eq 1 ]
 
     run verify "${JSON_FILE}" "${ENVELOPE_FILE}"
-    assert_output "${CTE_PASSED}"
+    assert_output ""
     [ "$status" -eq 0 ]
 }
 
 @test "Should verify when files" {
     run verify "${JSON_FILE}" "${ENVELOPE_FILE}"
-    assert_output "${CTE_PASSED}"
+    assert_output ""
     [ "$status" -eq 0 ]
 
     run verify "${DIFFERENT_VERSION_JSON_FILE}" "${ENVELOPE_FILE}"
