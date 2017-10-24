@@ -14,12 +14,13 @@ source "$( dirname "${BASH_SOURCE[0]}" )/utils.sh"
 # $1 - POM
 # $2 - Effective POM
 # $3 - Repo absolute folder
-# $4 - Override properties
-# $5 - Settings
+# $4 - ssh git transformation
+# $5 - Override properties
+# $6 - Settings
 #
 # Examples
 #
-#   getURL "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" "./override.properties" "~/m2/settings.xml"
+#   getURL "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" true "./override.properties" "~/m2/settings.xml"
 #
 # Returns the github URL/unreachable/scm
 #
@@ -27,8 +28,9 @@ function getURL {
     pom=$1
     effective=$2
     repo=$3
-    override=$4
-    settings=$5
+    ssh_git=$4
+    override=$5
+    settings=$6
 
     # Validate mandatory ARGUMENTS
     if [ ! -f $pom ] ; then
@@ -66,7 +68,7 @@ function getURL {
         fi
 
         if [ -n "${url}" ] ; then
-            if isReachable ${url} ${SSH_GIT} ; then  # Sometimes URLs are not reachable
+            if isReachable ${url} ${ssh_git} ; then  # Sometimes URLs are not reachable
                 status=${url}
             else
                 status=${CTE_UNREACHABLE}

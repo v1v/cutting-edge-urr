@@ -248,7 +248,7 @@ do
     message=${CTE_NONE}
 
     # Get URL
-    url=$(getURL ${pom} ${effective} "${repo}" "${OVERRIDE_FILE}" "${SETTINGS}")
+    url=$(getURL ${pom} ${effective} "${repo}" "${SSH_GIT}" "${OVERRIDE_FILE}" "${SETTINGS}")
     echo "     getURL stage - ${url}"
 
     groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
