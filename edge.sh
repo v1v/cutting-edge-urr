@@ -123,9 +123,21 @@ validate_arguments() {
     fi
     if [ ! -e $EXCLUDE_ARTIFACTS_FILE ]; then
         echo "WRONG: excludeArtifactIds file doesn't exist" ; exit 1
+    else
+        if [ -n "$EXCLUDE_ARTIFACTS_FILE" ] ; then
+            if [ `cat $EXCLUDE_ARTIFACTS_FILE | wc -l` -gt 1 ] ; then
+                echo "WRONG: excludeArtifactIds file cannot contains multilines" ; exit 1
+            fi
+        fi
     fi
     if [ ! -e $EXCLUDE_GROUPS_FILE ]; then
         echo "WRONG: excludeGroupIds file doesn't exist" ; exit 1
+    else
+        if [ -n "$EXCLUDE_GROUPS_FILE" ] ; then
+            if [  -n "$EXCLUDE_GROUPS_FILE" -o `cat $EXCLUDE_GROUPS_FILE | wc -l` -gt 1  ] ; then
+                echo "WRONG: excludeGroupIds file cannot contains multilines" ; exit 1
+            fi
+        fi
     fi
     if [ ! -d $RECIPES_FOLDER ]; then
         echo "WRONG: recipes folder doesn't exist" ; exit 1
