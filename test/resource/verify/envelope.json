@@ -1,0 +1,2261 @@
+{
+  "product": "cje",
+  "version": "2.73.1.3-edge",
+  "distribution": "rolling",
+  "core": "2.73.1-cb-3",
+  "plugins":   {
+    "async-http-client":     {
+      "name": "Async Http Client",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "async-http-client",
+      "version": "1.9.40.1-SNAPSHOT",
+      "scope": "bootstrap",
+      "sha1": "D9khyiJ2T2/0MPCYX9DIsrRacyc=",
+      "tier": "verified"
+    },
+    "bouncycastle-api":     {
+      "name": "bouncycastle API Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "bouncycastle-api",
+      "version": "2.16.3-SNAPSHOT",
+      "scope": "bootstrap",
+      "sha1": "0eDF8KcJ9GgwSJAPaylWkIlRvnM=",
+      "tier": "compatible"
+    },
+    "cloudbees-license":     {
+      "name": "CloudBees License Manager",
+      "groupId": "com.cloudbees.nectar.plugins",
+      "artifactId": "cloudbees-license",
+      "version": "9.18-SNAPSHOT",
+      "dependencies": {"async-http-client": "1.7.24"},
+      "scope": "bootstrap",
+      "sha1": "iw2i8VjYa1iyjYfaBVPqKIU1pSE=",
+      "tier": "proprietary"
+    },
+    "nectar-license":     {
+      "name": "CloudBees Jenkins Enterprise License Entitlement Check",
+      "groupId": "com.cloudbees.nectar.plugins",
+      "artifactId": "nectar-license",
+      "version": "8.7-SNAPSHOT",
+      "dependencies":       {
+        "async-http-client": "1.7.24",
+        "cloudbees-license": "8.0"
+      },
+      "scope": "bootstrap",
+      "sha1": "ai+Za8qpjPgrrSOVLrqoapm3CrU=",
+      "tier": "proprietary"
+    },
+    "structs":     {
+      "name": "Structs Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "structs",
+      "version": "1.11-SNAPSHOT",
+      "scope": "bootstrap",
+      "sha1": "/nxgvX2DCaDKT3Cg927V9d0oMJI=",
+      "tier": "verified"
+    },
+    "credentials":     {
+      "name": "Credentials Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "credentials",
+      "version": "2.1.17-SNAPSHOT",
+      "dependencies": {"structs": "1.7"},
+      "scope": "bootstrap",
+      "sha1": "VOzNAAKQH1AU5xfQaFcP5/mg330=",
+      "tier": "verified"
+    },
+    "jackson2-api":     {
+      "name": "Jackson 2 API Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "jackson2-api",
+      "version": "2.8.7.1-SNAPSHOT",
+      "scope": "bootstrap",
+      "sha1": "0G1lFzCsFUQxxiHDfAHyc6ZsSjw=",
+      "tier": "verified"
+    },
+    "metrics":     {
+      "name": "Metrics Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "metrics",
+      "version": "3.1.2.11-SNAPSHOT",
+      "dependencies": {"jackson2-api": "2.5.4"},
+      "scope": "bootstrap",
+      "sha1": "LJp/xrwnjHdyJrnhckZ0+yg0M1o=",
+      "tier": "verified"
+    },
+    "support-core":     {
+      "name": "Support Core Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "support-core",
+      "version": "2.42-SNAPSHOT",
+      "dependencies":       {
+        "credentials": "2.1.10",
+        "metrics": "3.0.0"
+      },
+      "optionalDependencies": {"async-http-client": "1.7.8"},
+      "scope": "bootstrap",
+      "sha1": "6rjiQMqRgpo5tO4sbCOlK80yKtg=",
+      "tier": "compatible"
+    },
+    "cloudbees-assurance":     {
+      "name": "Beekeeper Upgrade Assistant Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-assurance",
+      "version": "2.73.0.3-SNAPSHOT",
+      "dependencies":       {
+        "async-http-client": "1.7.24.1",
+        "cloudbees-license": "9.13",
+        "credentials": "2.1.13",
+        "jackson2-api": "2.7.3",
+        "nectar-license": "8.6",
+        "support-core": "2.41"
+      },
+      "optionalDependencies": {"metrics": "3.1.2.10"},
+      "scope": "bootstrap",
+      "sha1": "YHyhXBZekcJEzlQtDxs8q/fTW7k=",
+      "tier": "proprietary"
+    },
+    "cloudbees-folder":     {
+      "name": "Folders Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "cloudbees-folder",
+      "version": "6.2.2-SNAPSHOT",
+      "optionalDependencies": {"credentials": "2.1.11"},
+      "scope": "bootstrap",
+      "sha1": "NrU6kCWcW2/fKlJNSBSc/czuRmQ=",
+      "tier": "verified"
+    },
+    "cloudbees-folders-plus":     {
+      "name": "CloudBees Folders Plus Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-folders-plus",
+      "version": "3.3-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-folder": "5.0",
+        "nectar-license": "7.1"
+      },
+      "optionalDependencies": {"credentials": "1.16.1"},
+      "scope": "bootstrap",
+      "sha1": "of+fGnL9b6l9evzmq5yzTWrxv8E=",
+      "tier": "proprietary"
+    },
+    "display-url-api":     {
+      "name": "Display URL API",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "display-url-api",
+      "version": "2.1.1-SNAPSHOT",
+      "scope": "bootstrap",
+      "sha1": "mXL9KpduhsIqbsRcRXkabpo6lFM=",
+      "tier": "verified"
+    },
+    "icon-shim":     {
+      "name": "Icon Shim Plugin",
+      "groupId": "org.jenkins-ci.plugins.icon-shim",
+      "artifactId": "icon-shim",
+      "version": "2.0.4-SNAPSHOT",
+      "scope": "bootstrap",
+      "sha1": "eWP0DEfavmF2XI79QnMD/oK4iPU=",
+      "tier": "verified"
+    },
+    "junit":     {
+      "name": "JUnit Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "junit",
+      "version": "1.20",
+      "dependencies": {"structs": "1.2"},
+      "scope": "bootstrap",
+      "sha1": "rZ0R80BwZ39OzRX67cChIhogMy8=",
+      "tier": "verified"
+    },
+    "mailer":     {
+      "name": "Jenkins Mailer Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "mailer",
+      "version": "1.21-SNAPSHOT",
+      "dependencies": {"display-url-api": "1.0"},
+      "scope": "bootstrap",
+      "sha1": "fQIxD/tltapAfpRFe28xiHr/4iM=",
+      "tier": "verified"
+    },
+    "mapdb-api":     {
+      "name": "MapDB API Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "mapdb-api",
+      "version": "1.0.9.1-SNAPSHOT",
+      "scope": "bootstrap",
+      "sha1": "dZqqpBUAo2jquAlcWR/52IxlDag=",
+      "tier": "verified"
+    },
+    "matrix-auth":     {
+      "name": "Matrix Authorization Strategy Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "matrix-auth",
+      "version": "1.6",
+      "dependencies": {"icon-shim": "2.0.3"},
+      "optionalDependencies": {"cloudbees-folder": "5.2.2"},
+      "scope": "fat",
+      "sha1": "g++RRg7UIoMF19+EH8a4Z3q+yBM=",
+      "tier": "compatible"
+    },
+    "variant":     {
+      "name": "Variant Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "variant",
+      "version": "1.2-SNAPSHOT",
+      "scope": "bootstrap",
+      "sha1": "KzJLy3Ac8oCY+BXMB+IhhnbHkoc=",
+      "tier": "verified"
+    },
+    "nectar-rbac":     {
+      "name": "CloudBees Role-Based Access Control Plugin",
+      "groupId": "com.cloudbees.nectar",
+      "artifactId": "nectar-rbac",
+      "version": "5.18-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-folder": "5.0",
+        "nectar-license": "7.1",
+        "variant": "1.0"
+      },
+      "optionalDependencies":       {
+        "credentials": "1.24",
+        "matrix-auth": "1.2"
+      },
+      "scope": "bootstrap",
+      "sha1": "eM1JAGdCPGYu0s7+SZ71ht2GcD4=",
+      "tier": "proprietary"
+    },
+    "operations-center-agent":     {
+      "name": "Operations Center Agent",
+      "groupId": "com.cloudbees.operations-center.common",
+      "artifactId": "operations-center-agent",
+      "version": "2.73.0.2-SNAPSHOT",
+      "dependencies":       {
+        "async-http-client": "1.7.24.1",
+        "bouncycastle-api": "2.16.0"
+      },
+      "scope": "bootstrap",
+      "sha1": "izznZuj6F+h3qzgWGu2aDYWTIJc=",
+      "tier": "proprietary"
+    },
+    "ssh-credentials":     {
+      "name": "SSH Credentials Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "ssh-credentials",
+      "version": "1.14-SNAPSHOT",
+      "dependencies": {"credentials": "2.1.0"},
+      "scope": "fat",
+      "sha1": "B9yjPmBse8OHKJjdr69wXyCIMS0=",
+      "tier": "verified"
+    },
+    "cloudbees-ssh-slaves":     {
+      "name": "CloudBees SSH Build Agents Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-ssh-slaves",
+      "version": "2.2-SNAPSHOT",
+      "dependencies":       {
+        "bouncycastle-api": "1.648.3",
+        "cloudbees-license": "7.1",
+        "credentials": "1.18",
+        "nectar-license": "7.1",
+        "ssh-credentials": "1.10"
+      },
+      "scope": "fat",
+      "sha1": "hgfdEycCs+fX6hJVAsZe5wOynOg=",
+      "tier": "proprietary"
+    },
+    "cloudbees-monitoring":     {
+      "name": "CloudBees Monitoring Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-monitoring",
+      "version": "2.8-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-license": "7.1",
+        "mailer": "1.5",
+        "metrics": "3.1.2.7",
+        "nectar-license": "7.1"
+      },
+      "scope": "fat",
+      "sha1": "Dsed9nbuGEq+rQSXTX8jUsNatNo=",
+      "tier": "proprietary"
+    },
+    "javadoc":     {
+      "name": "Javadoc Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "javadoc",
+      "version": "1.5-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "cDS0fOQfgEUlDEnVjnNnJDb8ZM8=",
+      "tier": "verified"
+    },
+    "token-macro":     {
+      "name": "Token Macro Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "token-macro",
+      "version": "2.1",
+      "scope": "bootstrap",
+      "sha1": "EmvE18zdRjl9AoB4SV+gO2lpEV0=",
+      "tier": "verified"
+    },
+    "maven-plugin":     {
+      "name": "Maven Integration plugin",
+      "groupId": "org.jenkins-ci.main",
+      "artifactId": "maven-plugin",
+      "version": "2.14",
+      "dependencies":       {
+        "javadoc": "1.0",
+        "junit": "1.6",
+        "mailer": "1.7"
+      },
+      "optionalDependencies": {"token-macro": "1.1"},
+      "scope": "fat",
+      "sha1": "V3avC0dPTRHUKcsNnn4bZF1LAP0=",
+      "tier": "compatible"
+    },
+    "script-security":     {
+      "name": "Script Security Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "script-security",
+      "version": "1.35-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "zIj+R4ZKWMttFP/7nk6pCl4VVLY=",
+      "tier": "verified"
+    },
+    "promoted-builds":     {
+      "name": "Jenkins promoted builds plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "promoted-builds",
+      "version": "2.29",
+      "dependencies":       {
+        "maven-plugin": "2.13",
+        "script-security": "1.26"
+      },
+      "optionalDependencies": {"token-macro": "1.12.1"},
+      "otherDependencies":       {
+        "job-dsl": "1.44",
+        "project-inheritance": "1.5.3",
+        "rebuild": "1.22"
+      },
+      "scope": "fat",
+      "sha1": "jofmkrfTRvDbw3+UEYBP7TpPMdI=",
+      "tier": "compatible"
+    },
+    "cloudbees-template":     {
+      "name": "CloudBees Template Plugin",
+      "groupId": "com.cloudbees.nectar.plugins",
+      "artifactId": "cloudbees-template",
+      "version": "4.34-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-folder": "6.0.4",
+        "cloudbees-folders-plus": "3.1",
+        "credentials": "2.1.13",
+        "nectar-license": "8.6",
+        "script-security": "1.29.1"
+      },
+      "optionalDependencies":       {
+        "javadoc": "1.4",
+        "nectar-rbac": "5.16",
+        "promoted-builds": "2.29"
+      },
+      "scope": "fat",
+      "sha1": "qak2uyn1gTf6GQ8do1Gtg8nR9JA=",
+      "tier": "proprietary"
+    },
+    "workflow-step-api":     {
+      "name": "Pipeline: Step API",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-step-api",
+      "version": "2.14-SNAPSHOT",
+      "dependencies": {"structs": "1.5"},
+      "scope": "fat",
+      "sha1": "e9fVur42qzVwSYoopgGgyY1IVN0=",
+      "tier": "compatible"
+    },
+    "scm-api":     {
+      "name": "SCM API Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "scm-api",
+      "version": "2.1.1",
+      "scope": "fat",
+      "sha1": "Ik+l50jkEodHOe/xfriYGLpairw=",
+      "tier": "verified"
+    },
+    "workflow-api":     {
+      "name": "Pipeline: API",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-api",
+      "version": "2.23-SNAPSHOT",
+      "dependencies":       {
+        "scm-api": "2.0.8",
+        "structs": "1.7",
+        "workflow-step-api": "2.10"
+      },
+      "scope": "fat",
+      "sha1": "duhRxebbUf38ZDPU2wyccZYMIRc=",
+      "tier": "compatible"
+    },
+    "workflow-support":     {
+      "name": "Pipeline: Supporting APIs",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-support",
+      "version": "2.14",
+      "dependencies":       {
+        "script-security": "1.26",
+        "workflow-api": "2.11",
+        "workflow-step-api": "2.9"
+      },
+      "scope": "fat",
+      "sha1": "/s8MLRNjljCBUEjZekBHubAfHpA=",
+      "tier": "compatible"
+    },
+    "workflow-job":     {
+      "name": "Pipeline: Job",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-job",
+      "version": "2.12.2",
+      "dependencies":       {
+        "workflow-api": "2.15",
+        "workflow-step-api": "2.10",
+        "workflow-support": "2.14"
+      },
+      "scope": "fat",
+      "sha1": "9ToVgiYQPuzwCNAxH1KdfeAe7DE=",
+      "tier": "compatible"
+    },
+    "matrix-project":     {
+      "name": "Matrix Project Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "matrix-project",
+      "version": "1.13-SNAPSHOT",
+      "dependencies":       {
+        "junit": "1.20",
+        "script-security": "1.13"
+      },
+      "scope": "fat",
+      "sha1": "2nw4OLl9QXzDIkI0ynaZs0rJlOs=",
+      "tier": "compatible"
+    },
+    "unique-id":     {
+      "name": "Unique ID Library Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "unique-id",
+      "version": "2.1.4-SNAPSHOT",
+      "optionalDependencies": {"cloudbees-folder": "5.0"},
+      "scope": "fat",
+      "sha1": "Mf7G9oqmXw2nxttueZN8HnpXPPY=",
+      "tier": "compatible"
+    },
+    "operations-center-context":     {
+      "name": "Operations Center Context",
+      "groupId": "com.cloudbees.operations-center.common",
+      "artifactId": "operations-center-context",
+      "version": "2.73.0.1",
+      "dependencies":       {
+        "cloudbees-folder": "5.13",
+        "cloudbees-folders-plus": "3.0",
+        "cloudbees-license": "9.14",
+        "mapdb-api": "1.0.9.0",
+        "nectar-license": "8.6",
+        "token-macro": "2.0",
+        "variant": "1.0"
+      },
+      "optionalDependencies":       {
+        "cloudbees-monitoring": "2.5",
+        "cloudbees-template": "4.26",
+        "mailer": "1.20",
+        "matrix-project": "1.7.1",
+        "maven-plugin": "2.11",
+        "metrics": "3.1.2.9",
+        "script-security": "1.31",
+        "unique-id": "2.1.2",
+        "workflow-job": "2.6",
+        "workflow-step-api": "2.4"
+      },
+      "otherDependencies": {"mesos": "0.9.0"},
+      "scope": "bootstrap",
+      "sha1": "QAY09VvyWOpmzBdrivhWaHHdHZM=",
+      "tier": "proprietary"
+    },
+    "operations-center-client":     {
+      "name": "Operations Center Client Plugin",
+      "groupId": "com.cloudbees.operations-center.client",
+      "artifactId": "operations-center-client",
+      "version": "2.73.0.2-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-license": "9.14",
+        "credentials": "2.1.13",
+        "mapdb-api": "1.0.9.0",
+        "metrics": "3.1.2.9",
+        "nectar-license": "8.6",
+        "nectar-rbac": "5.8",
+        "operations-center-agent": "2.73.0.1",
+        "operations-center-context": "2.73.0.1"
+      },
+      "optionalDependencies":       {
+        "cloudbees-ssh-slaves": "1.5",
+        "support-core": "2.32"
+      },
+      "scope": "bootstrap",
+      "sha1": "7cheWx9xOw4slEeTuE6CuOAulfw=",
+      "tier": "proprietary"
+    },
+    "ace-editor":     {
+      "name": "JavaScript GUI Lib: ACE Editor bundle plugin",
+      "groupId": "org.jenkins-ci.ui",
+      "artifactId": "ace-editor",
+      "version": "1.1",
+      "scope": "fat",
+      "sha1": "s9X+deHyyKxTtyIub6m8oCSLAC8=",
+      "tier": "compatible"
+    },
+    "active-directory":     {
+      "name": "Jenkins Active Directory plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "active-directory",
+      "version": "2.7-SNAPSHOT",
+      "dependencies": {"mailer": "1.5"},
+      "scope": "fat",
+      "sha1": "KMfo6Eqn12uaI6rZymuZlqqMe4o=",
+      "tier": "compatible"
+    },
+    "ant":     {
+      "name": "Ant Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "ant",
+      "version": "1.8-SNAPSHOT",
+      "dependencies": {"structs": "1.6"},
+      "scope": "fat",
+      "sha1": "bhL0Vq/il/3l0mP6dW4JaLmrJdw=",
+      "tier": "verified"
+    },
+    "antisamy-markup-formatter":     {
+      "name": "OWASP Markup Formatter Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "antisamy-markup-formatter",
+      "version": "1.6-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "3y5nBqvPtgQ1nqsrGKrtJ/Wf5e0=",
+      "tier": "verified"
+    },
+    "authentication-tokens":     {
+      "name": "Authentication Tokens API Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "authentication-tokens",
+      "version": "1.4-SNAPSHOT",
+      "dependencies": {"credentials": "1.22"},
+      "scope": "fat",
+      "sha1": "y7YlV67tzSmImT+rlbXn6jEvQGQ=",
+      "tier": "verified"
+    },
+    "aws-java-sdk":     {
+      "name": "Amazon Web Services SDK",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "aws-java-sdk",
+      "version": "1.11.120-SNAPSHOT",
+      "dependencies": {"jackson2-api": "2.5.4"},
+      "scope": "fat",
+      "sha1": "cNVYY21rAdcC2CUgCn6CFN5KUQI=",
+      "tier": "compatible"
+    },
+    "plain-credentials":     {
+      "name": "Plain Credentials Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "plain-credentials",
+      "version": "1.5-SNAPSHOT",
+      "dependencies": {"credentials": "2.1.5"},
+      "scope": "fat",
+      "sha1": "8aCNpYkH8eLqoJZUgfmBM8X2Kns=",
+      "tier": "verified"
+    },
+    "credentials-binding":     {
+      "name": "Credentials Binding Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "credentials-binding",
+      "version": "1.14-SNAPSHOT",
+      "dependencies":       {
+        "credentials": "2.1.7",
+        "plain-credentials": "1.3",
+        "ssh-credentials": "1.11",
+        "structs": "1.7",
+        "workflow-step-api": "2.10"
+      },
+      "scope": "fat",
+      "sha1": "v08jbBIhfzBipEhWAs6UgL6qaOU=",
+      "tier": "verified"
+    },
+    "aws-credentials":     {
+      "name": "CloudBees Amazon Web Services Credentials Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "aws-credentials",
+      "version": "1.21",
+      "dependencies":       {
+        "aws-java-sdk": "1.10.16",
+        "credentials": "1.22",
+        "credentials-binding": "1.7"
+      },
+      "scope": "fat",
+      "sha1": "YGZA1Xy7vSXqFmq4/aiwtmnR6MI=",
+      "tier": "compatible"
+    },
+    "jquery":     {
+      "name": "Jenkins jQuery plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "jquery",
+      "version": "1.11.2-0",
+      "scope": "fat",
+      "sha1": "eOnfdKAq1jTJLA6XJ5qfQiXBY6o=",
+      "tier": "compatible"
+    },
+    "azure-publishersettings-credentials":     {
+      "name": "Azure PublisherSettings Credentials Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "azure-publishersettings-credentials",
+      "version": "1.3-SNAPSHOT",
+      "dependencies":       {
+        "credentials": "1.22",
+        "jquery": "1.11.2-0"
+      },
+      "optionalDependencies": {"credentials-binding": "1.7"},
+      "scope": "fat",
+      "sha1": "x+ZJTknyrDf5s392H9SMQzvQGpg=",
+      "tier": "compatible"
+    },
+    "nodejs":     {
+      "name": "NodeJS Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "nodejs",
+      "version": "0.2.2",
+      "scope": "fat",
+      "sha1": "L4rSu6JPLikrk6Yx5FBKT+xXvpk=",
+      "tier": "compatible"
+    },
+    "azure-cli":     {
+      "name": "CloudBees Azure CLI Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "azure-cli",
+      "version": "1.3-SNAPSHOT",
+      "dependencies":       {
+        "azure-publishersettings-credentials": "1.0",
+        "credentials": "1.22",
+        "nodejs": "0.2.1"
+      },
+      "scope": "fat",
+      "sha1": "kBt8gocEZQL8IIuDF8q1tWhMdY0=",
+      "tier": "proprietary"
+    },
+    "blueocean-commons":     {
+      "name": "Common API for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-commons",
+      "version": "1.1.7",
+      "scope": "fat",
+      "sha1": "y2lmPUAbzF+8hM+CeT+/SahXekE=",
+      "tier": "compatible"
+    },
+    "blueocean-jwt":     {
+      "name": "JWT for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-jwt",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-commons": "1.1.7",
+        "mailer": "1.20"
+      },
+      "scope": "fat",
+      "sha1": "0Gclzi6CmJ28alnbgYGaMf9sHgk=",
+      "tier": "compatible"
+    },
+    "blueocean-rest":     {
+      "name": "REST API for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-rest",
+      "version": "1.1.7",
+      "dependencies": {"blueocean-commons": "1.1.7"},
+      "scope": "fat",
+      "sha1": "uDMhVNuR+H8jRZM+27ZT1CwlyL8=",
+      "tier": "compatible"
+    },
+    "blueocean-web":     {
+      "name": "Web for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-web",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-rest": "1.1.7",
+        "metrics": "3.1.2.9",
+        "variant": "1.1"
+      },
+      "scope": "fat",
+      "sha1": "RnnvXZG/VLu4QAsy6/0YrJd4HuE=",
+      "tier": "compatible"
+    },
+    "blueocean-config":     {
+      "name": "Config API for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-config",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-commons": "1.1.7",
+        "blueocean-jwt": "1.1.7",
+        "blueocean-rest": "1.1.7",
+        "blueocean-web": "1.1.7"
+      },
+      "scope": "fat",
+      "sha1": "GTM4j9Ew6zRwcPmdVH7vYIX2LSs=",
+      "tier": "compatible"
+    },
+    "branch-api":     {
+      "name": "Branch API Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "branch-api",
+      "version": "2.0.10",
+      "dependencies":       {
+        "cloudbees-folder": "6.0.1",
+        "scm-api": "2.1.1",
+        "structs": "1.4"
+      },
+      "scope": "fat",
+      "sha1": "6p2V3RAEys3hGRuPiiAAGspfI9Y=",
+      "tier": "verified"
+    },
+    "workflow-scm-step":     {
+      "name": "Pipeline: SCM Step",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-scm-step",
+      "version": "2.7-SNAPSHOT",
+      "dependencies": {"workflow-step-api": "2.9"},
+      "scope": "fat",
+      "sha1": "rTY61Njate4loB5MWuCol8xvmxc=",
+      "tier": "compatible"
+    },
+    "git-client":     {
+      "name": "Jenkins Git client plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "git-client",
+      "version": "2.4.6",
+      "dependencies":       {
+        "credentials": "2.1.13",
+        "ssh-credentials": "1.13",
+        "structs": "1.6"
+      },
+      "scope": "fat",
+      "sha1": "hrXdswIVIc1Nyjrida/vUhYCvWY=",
+      "tier": "verified"
+    },
+    "run-condition":     {
+      "name": "Run Condition Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "run-condition",
+      "version": "1.1-SNAPSHOT",
+      "dependencies": {"token-macro": "1.5.1"},
+      "scope": "fat",
+      "sha1": "FPnW1B4bFFeRI98MTT0EQCbak+U=",
+      "tier": "compatible"
+    },
+    "conditional-buildstep":     {
+      "name": "Conditional BuildStep",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "conditional-buildstep",
+      "version": "1.3.7-SNAPSHOT",
+      "dependencies":       {
+        "matrix-project": "1.0",
+        "maven-plugin": "2.13",
+        "run-condition": "1.0",
+        "token-macro": "1.5.1"
+      },
+      "scope": "fat",
+      "sha1": "k+zYrsPyR6qhHBAvj0U3MgB2Yss=",
+      "tier": "compatible"
+    },
+    "parameterized-trigger":     {
+      "name": "Jenkins Parameterized Trigger plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "parameterized-trigger",
+      "version": "2.35.3-SNAPSHOT",
+      "dependencies":       {
+        "conditional-buildstep": "1.3.1",
+        "matrix-project": "1.6",
+        "script-security": "1.25"
+      },
+      "optionalDependencies": {"promoted-builds": "2.25"},
+      "otherDependencies": {"subversion": "2.5.7"},
+      "scope": "fat",
+      "sha1": "xFq2+eyUFGh6C6rgTDHU3844Ic8=",
+      "tier": "compatible"
+    },
+    "git":     {
+      "name": "Jenkins Git plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "git",
+      "version": "3.3.2",
+      "dependencies":       {
+        "credentials": "2.1.13",
+        "git-client": "2.4.0",
+        "mailer": "1.18",
+        "matrix-project": "1.7.1",
+        "scm-api": "2.1.0",
+        "ssh-credentials": "1.13",
+        "workflow-scm-step": "1.14.2"
+      },
+      "optionalDependencies":       {
+        "parameterized-trigger": "2.33",
+        "promoted-builds": "2.27",
+        "token-macro": "1.12.1"
+      },
+      "scope": "fat",
+      "sha1": "GDQK9jTqjGAHeQhZbtOAji+ZhmI=",
+      "tier": "verified"
+    },
+    "favorite":     {
+      "name": "Favorite",
+      "groupId": "org.jvnet.hudson.plugins",
+      "artifactId": "favorite",
+      "version": "2.3.2-SNAPSHOT",
+      "dependencies":       {
+        "mailer": "1.18",
+        "matrix-project": "1.7.1",
+        "token-macro": "2.0"
+      },
+      "scope": "fat",
+      "sha1": "N/TdJwU1Ei/CYMqC4PpZixMuN5A=",
+      "tier": "compatible"
+    },
+    "blueocean-autofavorite":     {
+      "name": "Autofavorite for Blue Ocean",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "blueocean-autofavorite",
+      "version": "1.0.1-SNAPSHOT",
+      "dependencies":       {
+        "branch-api": "1.10",
+        "favorite": "2.0",
+        "git": "2.4.2",
+        "workflow-job": "2.0"
+      },
+      "scope": "fat",
+      "sha1": "6MCC5Umoc4tMDTUCDg5xcEjyAKI=",
+      "tier": "compatible"
+    },
+    "jquery-detached":     {
+      "name": "JavaScript GUI Lib: jQuery bundles (jQuery and jQuery UI) plugin",
+      "groupId": "org.jenkins-ci.ui",
+      "artifactId": "jquery-detached",
+      "version": "1.2.1",
+      "scope": "fat",
+      "sha1": "eElGqILMm4TmpAhu7PMRD99ATwM=",
+      "tier": "compatible"
+    },
+    "workflow-cps":     {
+      "name": "Pipeline: Groovy",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-cps",
+      "version": "2.39",
+      "dependencies":       {
+        "ace-editor": "1.0.1",
+        "jquery-detached": "1.2.1",
+        "scm-api": "2.0.8",
+        "script-security": "1.31",
+        "structs": "1.7",
+        "workflow-api": "2.18",
+        "workflow-scm-step": "2.4",
+        "workflow-step-api": "2.10",
+        "workflow-support": "2.14"
+      },
+      "optionalDependencies": {"support-core": "2.32"},
+      "scope": "fat",
+      "sha1": "zCa5aT2/TWH7e4dFKPSTNSZcUuQ=",
+      "tier": "compatible"
+    },
+    "workflow-multibranch":     {
+      "name": "Pipeline: Multibranch",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-multibranch",
+      "version": "2.17-SNAPSHOT",
+      "dependencies":       {
+        "branch-api": "2.0.7",
+        "cloudbees-folder": "5.18",
+        "scm-api": "2.0.7",
+        "script-security": "1.26",
+        "structs": "1.7",
+        "workflow-api": "2.15",
+        "workflow-cps": "2.32",
+        "workflow-job": "2.10",
+        "workflow-scm-step": "2.4",
+        "workflow-step-api": "2.10",
+        "workflow-support": "2.14"
+      },
+      "scope": "fat",
+      "sha1": "HAO3g8MSEiHi9mX53dXlRgIhJKw=",
+      "tier": "compatible"
+    },
+    "blueocean-pipeline-scm-api":     {
+      "name": "Pipeline SCM API for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-pipeline-scm-api",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-rest": "1.1.7",
+        "branch-api": "2.0.9",
+        "credentials": "2.1.13",
+        "workflow-multibranch": "2.14"
+      },
+      "scope": "fat",
+      "sha1": "uTUC6m5nqpqTMaKKkKM5J1i9q30=",
+      "tier": "compatible"
+    },
+    "blueocean-rest-impl":     {
+      "name": "REST Implementation for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-rest-impl",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-jwt": "1.1.7",
+        "blueocean-rest": "1.1.7",
+        "blueocean-web": "1.1.7",
+        "cloudbees-folder": "6.0.4",
+        "credentials": "2.1.13",
+        "favorite": "2.3.0",
+        "junit": "1.20",
+        "mailer": "1.20",
+        "scm-api": "2.1.1"
+      },
+      "scope": "fat",
+      "sha1": "v7iFyHEJAqejTGkOl3ib7rg81/0=",
+      "tier": "compatible"
+    },
+    "durable-task":     {
+      "name": "Durable Task Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "durable-task",
+      "version": "1.16-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "vI2W5V6O/kYhZbbyQ4lhGDhnzh0=",
+      "tier": "compatible"
+    },
+    "workflow-durable-task-step":     {
+      "name": "Pipeline: Nodes and Processes",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-durable-task-step",
+      "version": "2.12",
+      "dependencies":       {
+        "durable-task": "1.14",
+        "script-security": "1.25",
+        "workflow-api": "2.8",
+        "workflow-step-api": "2.7",
+        "workflow-support": "2.13"
+      },
+      "scope": "fat",
+      "sha1": "U5mCScBSn6Rwasd7qekcjYnUMPg=",
+      "tier": "compatible"
+    },
+    "github-api":     {
+      "name": "GitHub API Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "github-api",
+      "version": "1.90-SNAPSHOT",
+      "dependencies": {"jackson2-api": "2.7.3"},
+      "scope": "fat",
+      "sha1": "iUg2nnhXD59K94X0t//P2UqHZFI=",
+      "tier": "compatible"
+    },
+    "github":     {
+      "name": "GitHub plugin",
+      "groupId": "com.coravy.hudson.plugins.github",
+      "artifactId": "github",
+      "version": "1.27.0",
+      "dependencies":       {
+        "credentials": "2.1.8",
+        "display-url-api": "2.0",
+        "git": "2.4.0",
+        "github-api": "1.80",
+        "plain-credentials": "1.1",
+        "scm-api": "2.0.3",
+        "token-macro": "1.11"
+      },
+      "scope": "fat",
+      "sha1": "vMHChBO1rWtG1u8MRpqTvpUqEAQ=",
+      "tier": "compatible"
+    },
+    "github-branch-source":     {
+      "name": "GitHub Branch Source Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "github-branch-source",
+      "version": "2.0.8",
+      "dependencies":       {
+        "credentials": "2.1.12",
+        "display-url-api": "0.1",
+        "git": "2.6.4",
+        "github": "1.26.0",
+        "github-api": "1.85.1",
+        "scm-api": "2.1.1"
+      },
+      "scope": "fat",
+      "sha1": "h8V3PMhTYJlUqUOcPcpjOiWquuQ=",
+      "tier": "verified"
+    },
+    "pipeline-input-step":     {
+      "name": "Pipeline: Input Step",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "pipeline-input-step",
+      "version": "2.9-SNAPSHOT",
+      "dependencies":       {
+        "workflow-api": "2.6",
+        "workflow-step-api": "2.5",
+        "workflow-support": "2.10"
+      },
+      "scope": "fat",
+      "sha1": "soUecC/t13pV2JXIuTKhzkgwKlU=",
+      "tier": "compatible"
+    },
+    "pipeline-stage-step":     {
+      "name": "Pipeline: Stage Step",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "pipeline-stage-step",
+      "version": "2.3-SNAPSHOT",
+      "dependencies":       {
+        "scm-api": "2.0.7",
+        "structs": "1.6",
+        "workflow-api": "2.15",
+        "workflow-step-api": "2.11"
+      },
+      "scope": "fat",
+      "sha1": "+8MKUNA/30WfC0YnGwL/yLH07Uo=",
+      "tier": "compatible"
+    },
+    "pipeline-graph-analysis":     {
+      "name": "Pipeline Graph Analysis Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "pipeline-graph-analysis",
+      "version": "1.4",
+      "dependencies":       {
+        "pipeline-input-step": "2.0",
+        "pipeline-stage-step": "2.2",
+        "workflow-api": "2.17",
+        "workflow-cps": "2.31",
+        "workflow-job": "2.0",
+        "workflow-step-api": "2.10",
+        "workflow-support": "2.14"
+      },
+      "scope": "fat",
+      "sha1": "z22KaZKj6hGdrzHhIJtEM7Dw0DM=",
+      "tier": "compatible"
+    },
+    "workflow-basic-steps":     {
+      "name": "Pipeline: Basic Steps",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-basic-steps",
+      "version": "2.5",
+      "dependencies":       {
+        "mailer": "1.13",
+        "structs": "1.6",
+        "workflow-api": "2.16",
+        "workflow-step-api": "2.10"
+      },
+      "scope": "fat",
+      "sha1": "27YrXufsqxYgV7dAiUCzVmRQZsM=",
+      "tier": "compatible"
+    },
+    "git-server":     {
+      "name": "Jenkins GIT server Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "git-server",
+      "version": "1.8-SNAPSHOT",
+      "dependencies": {"git-client": "1.11.0"},
+      "scope": "fat",
+      "sha1": "UO93rNWe93UHRTIGEmHonW/RzS4=",
+      "tier": "verified"
+    },
+    "workflow-cps-global-lib":     {
+      "name": "Pipeline: Shared Groovy Libraries",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-cps-global-lib",
+      "version": "2.10-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-folder": "5.12",
+        "git-client": "2.3.0",
+        "git-server": "1.7",
+        "scm-api": "2.1.1",
+        "script-security": "1.27",
+        "workflow-cps": "2.30",
+        "workflow-scm-step": "2.4"
+      },
+      "scope": "fat",
+      "sha1": "1UW7RNSDbkL1SQtrRlXaM8u5+tY=",
+      "tier": "compatible"
+    },
+    "docker-commons":     {
+      "name": "Docker Commons Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "docker-commons",
+      "version": "1.10-SNAPSHOT",
+      "dependencies":       {
+        "authentication-tokens": "1.1",
+        "credentials": "2.1.11",
+        "credentials-binding": "1.12"
+      },
+      "scope": "fat",
+      "sha1": "sS0e34DVXoetK7wks9wBZt165i0=",
+      "tier": "compatible"
+    },
+    "docker-workflow":     {
+      "name": "Docker Pipeline",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "docker-workflow",
+      "version": "1.14-SNAPSHOT",
+      "dependencies":       {
+        "docker-commons": "1.5",
+        "workflow-cps": "2.25",
+        "workflow-durable-task-step": "2.8"
+      },
+      "scope": "fat",
+      "sha1": "46jHiEee21PHuRKWmTJkRPQad7I=",
+      "tier": "compatible"
+    },
+    "pipeline-model-api":     {
+      "name": "Pipeline: Model API",
+      "groupId": "org.jenkinsci.plugins",
+      "artifactId": "pipeline-model-api",
+      "version": "1.1.6",
+      "dependencies":       {
+        "structs": "1.5",
+        "workflow-step-api": "2.9"
+      },
+      "scope": "fat",
+      "sha1": "z70DTGCpvLTwaZdR+XnYf+3Uj0I=",
+      "tier": "compatible"
+    },
+    "pipeline-model-extensions":     {
+      "name": "Pipeline: Declarative Extension Points API",
+      "groupId": "org.jenkinsci.plugins",
+      "artifactId": "pipeline-model-extensions",
+      "version": "1.1.6",
+      "dependencies":       {
+        "pipeline-model-api": "1.1.6",
+        "workflow-cps": "2.33",
+        "workflow-job": "2.11"
+      },
+      "scope": "fat",
+      "sha1": "WWf9izkEdxsTijzRahhCkE57gAc=",
+      "tier": "compatible"
+    },
+    "pipeline-model-declarative-agent":     {
+      "name": "Pipeline: Declarative Agent API",
+      "groupId": "org.jenkinsci.plugins",
+      "artifactId": "pipeline-model-declarative-agent",
+      "version": "1.1.1",
+      "dependencies": {"pipeline-model-extensions": "1.1.1"},
+      "scope": "fat",
+      "sha1": "iWUd9kq5vTJpAIWYxI96tUsHNag=",
+      "tier": "compatible"
+    },
+    "pipeline-stage-tags-metadata":     {
+      "name": "Pipeline: Stage Tags Metadata",
+      "groupId": "org.jenkinsci.plugins",
+      "artifactId": "pipeline-stage-tags-metadata",
+      "version": "1.1.6",
+      "scope": "fat",
+      "sha1": "/3zfm6ZocNNt0k1F4PMopycU7Gk=",
+      "tier": "compatible"
+    },
+    "pipeline-model-definition":     {
+      "name": "Pipeline: Model Definition",
+      "groupId": "org.jenkinsci.plugins",
+      "artifactId": "pipeline-model-definition",
+      "version": "1.1.6",
+      "dependencies":       {
+        "credentials-binding": "1.11",
+        "docker-workflow": "1.9",
+        "pipeline-model-api": "1.1.6",
+        "pipeline-model-declarative-agent": "1.1.1",
+        "pipeline-model-extensions": "1.1.6",
+        "pipeline-stage-step": "2.2",
+        "pipeline-stage-tags-metadata": "1.1.6",
+        "scm-api": "1.3",
+        "workflow-api": "2.16",
+        "workflow-basic-steps": "2.3",
+        "workflow-cps": "2.33",
+        "workflow-cps-global-lib": "2.7",
+        "workflow-durable-task-step": "2.5",
+        "workflow-multibranch": "2.9.2",
+        "workflow-scm-step": "2.3",
+        "workflow-support": "2.14"
+      },
+      "scope": "fat",
+      "sha1": "9VAxt7Rii08YyIyN1AuomBMgTR8=",
+      "tier": "compatible"
+    },
+    "blueocean-pipeline-api-impl":     {
+      "name": "Pipeline implementation for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-pipeline-api-impl",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-pipeline-scm-api": "1.1.7",
+        "blueocean-rest-impl": "1.1.7",
+        "branch-api": "2.0.9",
+        "credentials": "2.1.13",
+        "git": "3.3.0",
+        "github-branch-source": "2.0.5",
+        "pipeline-graph-analysis": "1.3",
+        "pipeline-input-step": "2.8",
+        "pipeline-model-definition": "1.1.4",
+        "pipeline-stage-step": "2.2",
+        "scm-api": "2.1.1",
+        "workflow-api": "2.17",
+        "workflow-cps": "2.31",
+        "workflow-durable-task-step": "2.11",
+        "workflow-job": "2.10",
+        "workflow-multibranch": "2.14",
+        "workflow-step-api": "2.10",
+        "workflow-support": "2.14"
+      },
+      "scope": "fat",
+      "sha1": "6N6GpFtj6nmPdswSWbMuR7aXnPw=",
+      "tier": "compatible"
+    },
+    "pipeline-github-lib":     {
+      "name": "Pipeline: GitHub Groovy Libraries",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "pipeline-github-lib",
+      "version": "1.1-SNAPSHOT",
+      "dependencies":       {
+        "git": "3.0.2",
+        "workflow-cps-global-lib": "2.5"
+      },
+      "scope": "fat",
+      "sha1": "IZ9iNGkNJFkzV4RY16DZ3dVDslg=",
+      "tier": "compatible"
+    },
+    "github-organization-folder":     {
+      "name": "GitHub Organization Folder Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "github-organization-folder",
+      "version": "1.7-SNAPSHOT",
+      "dependencies":       {
+        "branch-api": "2.0.0",
+        "cloudbees-folder": "5.16",
+        "github": "1.25.1",
+        "github-branch-source": "2.0.0",
+        "pipeline-github-lib": "1.0",
+        "scm-api": "2.0.1",
+        "workflow-cps": "2.14",
+        "workflow-cps-global-lib": "2.3",
+        "workflow-job": "2.5",
+        "workflow-multibranch": "2.10",
+        "workflow-scm-step": "2.2",
+        "workflow-step-api": "2.3"
+      },
+      "scope": "fat",
+      "sha1": "kiqAP1CEFhLKLwnuPc8HSzZFjNI=",
+      "tier": "compatible"
+    },
+    "pubsub-light":     {
+      "name": "Jenkins Pub-Sub \"light\" Bus",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "pubsub-light",
+      "version": "1.13-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "JUpcDAetkNcKi//HSq1dT6JxbuI=",
+      "tier": "compatible"
+    },
+    "blueocean-github-pipeline":     {
+      "name": "GitHub Pipeline for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-github-pipeline",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-pipeline-api-impl": "1.1.7",
+        "github-branch-source": "2.0.5",
+        "pubsub-light": "1.8"
+      },
+      "optionalDependencies": {"github-organization-folder": "1.6"},
+      "scope": "fat",
+      "sha1": "uA2icDHgtmAWr7+9RHQt5vMEfcU=",
+      "tier": "compatible"
+    },
+    "blueocean-i18n":     {
+      "name": "i18n for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-i18n",
+      "version": "1.1.7",
+      "dependencies": {"blueocean-rest": "1.1.7"},
+      "scope": "fat",
+      "sha1": "sdkibPY11j/PhFpDqqG+fjCed6o=",
+      "tier": "compatible"
+    },
+    "blueocean-git-pipeline":     {
+      "name": "Git Pipeline for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-git-pipeline",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-pipeline-scm-api": "1.1.7",
+        "git": "3.3.0"
+      },
+      "scope": "fat",
+      "sha1": "oYJuD44v9S2uQxClq+1B1rS34rs=",
+      "tier": "compatible"
+    },
+    "sse-gateway":     {
+      "name": "Server Sent Events (SSE) Gateway Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "sse-gateway",
+      "version": "1.16-SNAPSHOT",
+      "dependencies": {"pubsub-light": "1.6"},
+      "scope": "fat",
+      "sha1": "sdKp49gtK0/Bn6nYd7G95iiD+74=",
+      "tier": "compatible"
+    },
+    "blueocean-events":     {
+      "name": "Events API for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-events",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-pipeline-api-impl": "1.1.7",
+        "pubsub-light": "1.8",
+        "sse-gateway": "1.15"
+      },
+      "scope": "fat",
+      "sha1": "osg2vwPLGBccEuWjSqqnbW/pOJU=",
+      "tier": "compatible"
+    },
+    "blueocean-display-url":     {
+      "name": "Display URL for Blue Ocean",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "blueocean-display-url",
+      "version": "2.1.2-SNAPSHOT",
+      "dependencies":       {
+        "blueocean-rest": "1.1.5",
+        "display-url-api": "2.0",
+        "scm-api": "2.1.1",
+        "workflow-job": "2.6",
+        "workflow-multibranch": "2.8"
+      },
+      "scope": "fat",
+      "sha1": "ulaLtMfXBqht8hI8eJkd18+XOuE=",
+      "tier": "compatible"
+    },
+    "blueocean-personalization":     {
+      "name": "Personalization for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-personalization",
+      "version": "1.1.7",
+      "scope": "fat",
+      "sha1": "kPsECZAQuo5L39Zy+t3eiYB2fDw=",
+      "tier": "compatible"
+    },
+    "blueocean-dashboard":     {
+      "name": "Dashboard for Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-dashboard",
+      "version": "1.1.7",
+      "scope": "fat",
+      "sha1": "zzkHxmYxjOG+pa7+BWjQCwr0/2Y=",
+      "tier": "compatible"
+    },
+    "blueocean-pipeline-editor":     {
+      "name": "Blue Ocean Pipeline Editor",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean-pipeline-editor",
+      "version": "0.2.0",
+      "dependencies":       {
+        "blueocean-commons": "1.0.0-rc1",
+        "blueocean-pipeline-api-impl": "1.0.0-rc1",
+        "blueocean-rest": "1.0.0-rc1",
+        "blueocean-web": "1.0.0-rc1",
+        "pipeline-model-definition": "1.0"
+      },
+      "scope": "fat",
+      "sha1": "Fk48exTiwEa7+WA7MCvdFSH4rqM=",
+      "tier": "compatible"
+    },
+    "blueocean":     {
+      "name": "Blue Ocean",
+      "groupId": "io.jenkins.blueocean",
+      "artifactId": "blueocean",
+      "version": "1.1.7",
+      "dependencies":       {
+        "blueocean-autofavorite": "1.0.0",
+        "blueocean-commons": "1.1.7",
+        "blueocean-config": "1.1.7",
+        "blueocean-dashboard": "1.1.7",
+        "blueocean-display-url": "2.0",
+        "blueocean-events": "1.1.7",
+        "blueocean-git-pipeline": "1.1.7",
+        "blueocean-github-pipeline": "1.1.7",
+        "blueocean-i18n": "1.1.7",
+        "blueocean-jwt": "1.1.7",
+        "blueocean-personalization": "1.1.7",
+        "blueocean-pipeline-api-impl": "1.1.7",
+        "blueocean-pipeline-editor": "0.2.0",
+        "blueocean-rest": "1.1.7",
+        "blueocean-rest-impl": "1.1.7",
+        "blueocean-web": "1.1.7"
+      },
+      "scope": "fat",
+      "sha1": "p34d2K4iYFLw+wfvFKFJlgjswv8=",
+      "tier": "compatible"
+    },
+    "build-timeout":     {
+      "name": "Build Timeout",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "build-timeout",
+      "version": "1.20-SNAPSHOT",
+      "dependencies": {"token-macro": "1.5.1"},
+      "otherDependencies": {"naginator": "1.16"},
+      "scope": "fat",
+      "sha1": "RSUw2EUlrFfVaLuGDFzpENiGs7M=",
+      "tier": "compatible"
+    },
+    "cloudbees-aborted-builds":     {
+      "name": "CloudBees Restart Aborted Builds Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-aborted-builds",
+      "version": "1.10-SNAPSHOT",
+      "dependencies":       {
+        "durable-task": "1.4",
+        "nectar-license": "7.1"
+      },
+      "scope": "fat",
+      "sha1": "CJMVj5CpACZD1cODeXFCC/gRmoA=",
+      "tier": "proprietary"
+    },
+    "cloudbees-aws-cli":     {
+      "name": "CloudBees Amazon AWS CLI Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-aws-cli",
+      "version": "1.5.9-SNAPSHOT",
+      "dependencies":       {
+        "async-http-client": "1.7.24.1",
+        "aws-credentials": "1.10",
+        "aws-java-sdk": "1.11.37",
+        "cloudbees-license": "7.1",
+        "credentials": "2.1.2",
+        "nectar-license": "7.1",
+        "structs": "1.6"
+      },
+      "scope": "fat",
+      "sha1": "sP+z0hxiAGaMc7N24ehE9y5Wzxg=",
+      "tier": "proprietary"
+    },
+    "cloudbees-aws-credentials":     {
+      "name": "Former CloudBees Amazon Web Services Credentials Plugin (no longer in use)",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-aws-credentials",
+      "version": "1.8.4",
+      "dependencies": {"aws-credentials": "1.10"},
+      "scope": "fat",
+      "sha1": "yErmNxt0WR99uzvI7z38Tb08Rss=",
+      "tier": "proprietary"
+    },
+    "deployed-on-column":     {
+      "name": "Deployed On Column Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "deployed-on-column",
+      "version": "1.9-SNAPSHOT",
+      "dependencies":       {
+        "matrix-project": "1.3",
+        "maven-plugin": "2.13"
+      },
+      "scope": "fat",
+      "sha1": "kt1hY4CKXGGbUzhhCgu7rJROjqE=",
+      "tier": "compatible"
+    },
+    "deployer-framework":     {
+      "name": "Deployer Framework Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "deployer-framework",
+      "version": "1.2-SNAPSHOT",
+      "dependencies":       {
+        "credentials": "1.16.1",
+        "deployed-on-column": "1.7",
+        "matrix-project": "1.2",
+        "maven-plugin": "2.5",
+        "token-macro": "1.10"
+      },
+      "optionalDependencies":       {
+        "javadoc": "1.0",
+        "promoted-builds": "2.17"
+      },
+      "scope": "fat",
+      "sha1": "jX1J9TeJ9MvRp/QQAu00rxNZl8A=",
+      "tier": "compatible"
+    },
+    "cloudbees-aws-deployer":     {
+      "name": "CloudBees Amazon Web Services Deploy Engine Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-aws-deployer",
+      "version": "1.18-SNAPSHOT",
+      "dependencies":       {
+        "aws-credentials": "1.10",
+        "aws-java-sdk": "1.11.37",
+        "cloudbees-license": "7.1",
+        "credentials": "1.22",
+        "deployer-framework": "1.1",
+        "nectar-license": "7.1"
+      },
+      "scope": "fat",
+      "sha1": "HdGIrTrcLhuyMr71qjf1Z5vaKpo=",
+      "tier": "proprietary"
+    },
+    "mercurial":     {
+      "name": "Jenkins Mercurial plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "mercurial",
+      "version": "1.61",
+      "dependencies":       {
+        "credentials": "2.1.10",
+        "matrix-project": "1.2",
+        "scm-api": "2.1.0",
+        "ssh-credentials": "1.6"
+      },
+      "otherDependencies": {"multiple-scms": "0.4-beta-1"},
+      "scope": "fat",
+      "sha1": "xs5kyLwiNhCaluJ3vdO+SF6Eopc=",
+      "tier": "compatible"
+    },
+    "cloudbees-bitbucket-branch-source":     {
+      "name": "Bitbucket Branch Source Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "cloudbees-bitbucket-branch-source",
+      "version": "2.1.2",
+      "dependencies":       {
+        "display-url-api": "0.2",
+        "git": "2.6.5",
+        "mercurial": "1.58",
+        "scm-api": "2.0.4"
+      },
+      "scope": "fat",
+      "sha1": "VARORBFGzLzqodSTuwe48GjeGEY=",
+      "tier": "compatible"
+    },
+    "cloudbees-even-scheduler":     {
+      "name": "CloudBees Even Scheduler Plugin",
+      "groupId": "com.cloudbees.nectar.plugins",
+      "artifactId": "cloudbees-even-scheduler",
+      "version": "3.9-SNAPSHOT",
+      "dependencies": {"nectar-license": "7.1"},
+      "scope": "fat",
+      "sha1": "zZMQhPRkujVg0tSwl2raTiN0wXs=",
+      "tier": "proprietary"
+    },
+    "cloudbees-github-pull-requests":     {
+      "name": "CloudBees GitHub Pull Requests Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-github-pull-requests",
+      "version": "1.3-SNAPSHOT",
+      "dependencies":       {
+        "branch-api": "1.3",
+        "github-branch-source": "1.2"
+      },
+      "scope": "fat",
+      "sha1": "0PsyxnWeP6tI+0uOMeSfJ1EHGN4=",
+      "tier": "proprietary"
+    },
+    "cloudbees-groovy-view":     {
+      "name": "CloudBees Groovy View Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-groovy-view",
+      "version": "1.7-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-template": "4.17",
+        "nectar-license": "7.1",
+        "script-security": "1.10"
+      },
+      "scope": "fat",
+      "sha1": "Zb4k4PbPYGiHj0BEDKFoJXKMYQk=",
+      "tier": "proprietary"
+    },
+    "cloudbees-ha":     {
+      "name": "CloudBees High Availability Management plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-ha",
+      "version": "4.13-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-license": "7.1",
+        "nectar-license": "7.1"
+      },
+      "scope": "fat",
+      "sha1": "Dxg9z01cked5hTz5WzmgRLRA5hI=",
+      "tier": "proprietary"
+    },
+    "cloudbees-jsync-archiver":     {
+      "name": "CloudBees Fast Archiving Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-jsync-archiver",
+      "version": "5.7-SNAPSHOT",
+      "dependencies": {"nectar-license": "7.1"},
+      "scope": "fat",
+      "sha1": "U1UE2MWsMNwK+j1/+i6aE29m0uw=",
+      "tier": "proprietary"
+    },
+    "cloudbees-label-throttling-plugin":     {
+      "name": "CloudBees Label Throttling Plugin",
+      "groupId": "com.cloudbees.nectar.plugins",
+      "artifactId": "cloudbees-label-throttling-plugin",
+      "version": "3.6-SNAPSHOT",
+      "dependencies": {"nectar-license": "5.7"},
+      "scope": "fat",
+      "sha1": "DitIHvpN9eby491dIJm94qO9/nM=",
+      "tier": "proprietary"
+    },
+    "cloudbees-long-running-build":     {
+      "name": "CloudBees Long-Running Build Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-long-running-build",
+      "version": "1.11-SNAPSHOT",
+      "dependencies":       {
+        "durable-task": "1.13",
+        "nectar-license": "8.6"
+      },
+      "scope": "fat",
+      "sha1": "t+YcB8FsVQ0X75TWWLq2HXc/nIM=",
+      "tier": "proprietary"
+    },
+    "cloudbees-nodes-plus":     {
+      "name": "CloudBees Nodes Plus Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-nodes-plus",
+      "version": "1.16-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-license": "7.18",
+        "mailer": "1.17",
+        "nectar-license": "7.17"
+      },
+      "optionalDependencies":       {
+        "credentials": "2.1.11",
+        "nectar-rbac": "5.13"
+      },
+      "scope": "fat",
+      "sha1": "MtJCWSkFa+WujdXSAHlcZIGasr4=",
+      "tier": "proprietary"
+    },
+    "cloudbees-plugin-usage":     {
+      "name": "CloudBees Plugin Usage Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-plugin-usage",
+      "version": "1.7-SNAPSHOT",
+      "dependencies": {"nectar-license": "7.1"},
+      "scope": "fat",
+      "sha1": "qLmA4HCBPV3eowXmu8401t/VS7k=",
+      "tier": "proprietary"
+    },
+    "cloudbees-quiet-start":     {
+      "name": "CloudBees Quiet Start Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-quiet-start",
+      "version": "1.4-SNAPSHOT",
+      "dependencies": {"nectar-license": "7.1"},
+      "scope": "fat",
+      "sha1": "xby1DQTCSvMH2gp7vb8zUEMgW1A=",
+      "tier": "proprietary"
+    },
+    "cloudbees-support":     {
+      "name": "CloudBees Support Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-support",
+      "version": "3.12-SNAPSHOT",
+      "dependencies":       {
+        "metrics": "3.1.2.4",
+        "support-core": "2.37"
+      },
+      "optionalDependencies": {"cloudbees-license": "7.16"},
+      "scope": "fat",
+      "sha1": "AR1cKLMCo2JVU+XwSiNQN+YFNYs=",
+      "tier": "proprietary"
+    },
+    "cloudbees-view-creation-filter":     {
+      "name": "CloudBees View Creation Filter Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "cloudbees-view-creation-filter",
+      "version": "1.5-SNAPSHOT",
+      "dependencies": {"nectar-license": "7.1"},
+      "scope": "fat",
+      "sha1": "LbRbGBJggIW81A6MtDKvnpVEueM=",
+      "tier": "proprietary"
+    },
+    "cloudbees-workflow-aggregator":     {
+      "name": "CloudBees Pipeline (Deprecated)",
+      "groupId": "com.cloudbees.jenkins.plugins.workflow",
+      "artifactId": "cloudbees-workflow-aggregator",
+      "version": "1.9.1",
+      "scope": "fat",
+      "sha1": "59G+SeuvGS9gY/SdK+gYdA41AlE=",
+      "tier": "proprietary"
+    },
+    "cloudbees-workflow-rest-api":     {
+      "name": "CloudBees Pipeline: REST API (Deprecated)",
+      "groupId": "com.cloudbees.jenkins.plugins.workflow",
+      "artifactId": "cloudbees-workflow-rest-api",
+      "version": "1.9.1",
+      "scope": "fat",
+      "sha1": "7oKyN+SfMXqs/ZAtpV1kDON7B6A=",
+      "tier": "proprietary"
+    },
+    "cloudbees-workflow-template":     {
+      "name": "CloudBees Pipeline: Templates Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins.workflow",
+      "artifactId": "cloudbees-workflow-template",
+      "version": "2.8-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-folder": "5.13",
+        "cloudbees-template": "4.26",
+        "credentials": "2.1.8",
+        "nectar-license": "7.17",
+        "scm-api": "2.1.1",
+        "script-security": "1.23",
+        "structs": "1.5",
+        "workflow-api": "2.4",
+        "workflow-cps": "2.18",
+        "workflow-job": "2.7",
+        "workflow-multibranch": "2.9",
+        "workflow-scm-step": "2.2",
+        "workflow-step-api": "2.4"
+      },
+      "scope": "fat",
+      "sha1": "yWJUy7SSIOB3wm1gcEQYziSnJG8=",
+      "tier": "proprietary"
+    },
+    "workflow-cps-checkpoint":     {
+      "name": "CloudBees Pipeline: Groovy Checkpoint Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins.workflow",
+      "artifactId": "workflow-cps-checkpoint",
+      "version": "2.4",
+      "dependencies":       {
+        "nectar-license": "7.1",
+        "scm-api": "1.3",
+        "workflow-api": "2.4",
+        "workflow-cps": "2.14",
+        "workflow-job": "2.3",
+        "workflow-scm-step": "2.2"
+      },
+      "scope": "fat",
+      "sha1": "52qMs4K+0B97weT9bN2QtJCelA0=",
+      "tier": "proprietary"
+    },
+    "pipeline-rest-api":     {
+      "name": "Pipeline: REST API Plugin",
+      "groupId": "org.jenkins-ci.plugins.pipeline-stage-view",
+      "artifactId": "pipeline-rest-api",
+      "version": "2.8",
+      "dependencies":       {
+        "pipeline-graph-analysis": "1.1",
+        "pipeline-input-step": "2.0",
+        "pipeline-stage-step": "2.2",
+        "workflow-api": "2.15",
+        "workflow-job": "2.0",
+        "workflow-step-api": "2.10",
+        "workflow-support": "2.14"
+      },
+      "scope": "fat",
+      "sha1": "y/hYaJMxPkld1EHA98zeNA16km4=",
+      "tier": "compatible"
+    },
+    "handlebars":     {
+      "name": "JavaScript GUI Lib: Handlebars bundle plugin",
+      "groupId": "org.jenkins-ci.ui",
+      "artifactId": "handlebars",
+      "version": "1.1.1",
+      "scope": "fat",
+      "sha1": "i3C/c7dvTiSmxDvD9edsBEDL/a0=",
+      "tier": "compatible"
+    },
+    "momentjs":     {
+      "name": "JavaScript GUI Lib: Moment.js bundle plugin",
+      "groupId": "org.jenkins-ci.ui",
+      "artifactId": "momentjs",
+      "version": "1.1.1",
+      "scope": "fat",
+      "sha1": "3rbaDBZxLsxRhVGzOws6ZuERJBY=",
+      "tier": "compatible"
+    },
+    "pipeline-stage-view":     {
+      "name": "Pipeline: Stage View Plugin",
+      "groupId": "org.jenkins-ci.plugins.pipeline-stage-view",
+      "artifactId": "pipeline-stage-view",
+      "version": "2.8",
+      "dependencies":       {
+        "handlebars": "1.1",
+        "jquery-detached": "1.2.1",
+        "momentjs": "1.1",
+        "pipeline-rest-api": "2.8",
+        "workflow-job": "2.0"
+      },
+      "scope": "fat",
+      "sha1": "KeIrVO2u32u5tU+MizUiuvo6oDw=",
+      "tier": "compatible"
+    },
+    "cloudbees-workflow-ui":     {
+      "name": "CloudBees Pipeline Stage View Extensions",
+      "groupId": "com.cloudbees.jenkins.plugins.workflow",
+      "artifactId": "cloudbees-workflow-ui",
+      "version": "2.2-SNAPSHOT",
+      "dependencies":       {
+        "nectar-license": "7.1",
+        "pipeline-stage-view": "1.3",
+        "workflow-cps-checkpoint": "1.9"
+      },
+      "scope": "fat",
+      "sha1": "GF0nb2xE1yTMxD89mHCWsVdnsxM=",
+      "tier": "proprietary"
+    },
+    "copyartifact":     {
+      "name": "Copy Artifact Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "copyartifact",
+      "version": "1.39-SNAPSHOT",
+      "dependencies": {"matrix-project": "1.3"},
+      "optionalDependencies": {"maven-plugin": "2.7.1"},
+      "scope": "fat",
+      "sha1": "hkJZqcF94TpcNPrN6MaxE5pgQds=",
+      "tier": "compatible"
+    },
+    "dashboard-view":     {
+      "name": "Dashboard View",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "dashboard-view",
+      "version": "2.9.12-SNAPSHOT",
+      "dependencies":       {
+        "matrix-project": "1.3",
+        "maven-plugin": "2.13"
+      },
+      "scope": "fat",
+      "sha1": "EX2pV0lcgjVXunNFfLDN4Pdr5A0=",
+      "tier": "compatible"
+    },
+    "docker-build-publish":     {
+      "name": "CloudBees Docker Build and Publish plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "docker-build-publish",
+      "version": "1.3.3-SNAPSHOT",
+      "dependencies":       {
+        "docker-commons": "1.3.1",
+        "token-macro": "1.10"
+      },
+      "scope": "fat",
+      "sha1": "DTxItVUsxUVBB2pn6liy/Ga5+GM=",
+      "tier": "compatible"
+    },
+    "docker-traceability":     {
+      "name": "CloudBees Docker Traceability",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "docker-traceability",
+      "version": "1.3-SNAPSHOT",
+      "dependencies": {"docker-commons": "1.0"},
+      "scope": "fat",
+      "sha1": "Y2R3wk5A8O2Slntu032EkfS7MtU=",
+      "tier": "compatible"
+    },
+    "dockerhub-notification":     {
+      "name": "CloudBees Docker Hub/Registry Notification",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "dockerhub-notification",
+      "version": "2.2.1-SNAPSHOT",
+      "dependencies":       {
+        "async-http-client": "1.7.8",
+        "docker-commons": "1.0"
+      },
+      "scope": "fat",
+      "sha1": "yKmCbUugoOeVzOwt6PO3SpALvUE=",
+      "tier": "compatible"
+    },
+    "email-ext":     {
+      "name": "Email Extension Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "email-ext",
+      "version": "2.61-SNAPSHOT",
+      "dependencies":       {
+        "junit": "1.2",
+        "mailer": "1.13",
+        "matrix-project": "1.4",
+        "script-security": "1.27",
+        "structs": "1.6",
+        "token-macro": "2.0"
+      },
+      "optionalDependencies":       {
+        "workflow-job": "2.11",
+        "workflow-step-api": "2.9"
+      },
+      "otherDependencies":       {
+        "analysis-core": "1.54",
+        "config-file-provider": "2.15.6"
+      },
+      "scope": "fat",
+      "sha1": "Q/yoUcraLgZYmRBsXYB3kwEOaNQ=",
+      "tier": "compatible"
+    },
+    "external-monitor-job":     {
+      "name": "External Monitor Job Type Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "external-monitor-job",
+      "version": "1.8-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "X1jPW6V9iqn3QaLPze7SRjFsKMU=",
+      "tier": "compatible"
+    },
+    "git-validated-merge":     {
+      "name": "CloudBees Git Validated Merge Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "git-validated-merge",
+      "version": "3.23-SNAPSHOT",
+      "dependencies":       {
+        "credentials": "1.15",
+        "git": "3.1.0",
+        "git-client": "2.4.6",
+        "mailer": "1.5",
+        "nectar-license": "7.1",
+        "ssh-credentials": "1.4"
+      },
+      "scope": "fat",
+      "sha1": "j+ck0c7H/NT2SCKwrHDE9PI5RxY=",
+      "tier": "proprietary"
+    },
+    "github-pull-request-build":     {
+      "name": "CloudBees Pull Request Builder for GitHub",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "github-pull-request-build",
+      "version": "1.12-SNAPSHOT",
+      "dependencies":       {
+        "git": "2.2.1",
+        "git-client": "1.8.0",
+        "git-validated-merge": "3.14",
+        "github": "1.11.3",
+        "github-api": "1.67"
+      },
+      "scope": "fat",
+      "sha1": "Bp/bY0D6H0c6bRfftVa1EJkwYbk=",
+      "tier": "proprietary"
+    },
+    "gradle":     {
+      "name": "Gradle Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "gradle",
+      "version": "1.26",
+      "dependencies": {"structs": "1.3"},
+      "scope": "fat",
+      "sha1": "Kelz+W3Iuf68OyV+QBAJLxRoIoI=",
+      "tier": "verified"
+    },
+    "infradna-backup":     {
+      "name": "CloudBees Back-up Plugin",
+      "groupId": "com.infradna.hudson.plugins",
+      "artifactId": "infradna-backup",
+      "version": "3.36-SNAPSHOT",
+      "dependencies":       {
+        "async-http-client": "1.7.24.1",
+        "aws-credentials": "1.13",
+        "aws-java-sdk": "1.11.68",
+        "cloudbees-license": "7.1",
+        "credentials": "1.23",
+        "nectar-license": "7.1",
+        "ssh-credentials": "1.9"
+      },
+      "scope": "fat",
+      "sha1": "zoUC3/bfJehsSyoFdtPE+11vU5s=",
+      "tier": "proprietary"
+    },
+    "ldap":     {
+      "name": "LDAP Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "ldap",
+      "version": "1.18-SNAPSHOT",
+      "dependencies": {"mailer": "1.20"},
+      "scope": "fat",
+      "sha1": "b1kHDomxI9euaSsDek1c/kugLgc=",
+      "tier": "verified"
+    },
+    "monitoring":     {
+      "name": "Monitoring",
+      "groupId": "org.jvnet.hudson.plugins",
+      "artifactId": "monitoring",
+      "version": "1.70.0-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "b2kXQtBcbYFPLcvT/YiYOUIz/58=",
+      "tier": "compatible"
+    },
+    "msbuild":     {
+      "name": "Jenkins MSBuild Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "msbuild",
+      "version": "1.29-SNAPSHOT",
+      "dependencies": {"structs": "1.3"},
+      "scope": "fat",
+      "sha1": "v3SIT3yjtkwCyZbZDV+p3B2sG/k=",
+      "tier": "verified"
+    },
+    "mstestrunner":     {
+      "name": "Jenkins MSTestRunner plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "mstestrunner",
+      "version": "1.3.2-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "HIUN3i9sOSxZkIJdVeel9AIEgRA=",
+      "tier": "verified"
+    },
+    "node-iterator-api":     {
+      "name": "Node Iterator API Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "node-iterator-api",
+      "version": "1.6-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "jy7uGDNQyDGoLizY0YkIiBQ7JdU=",
+      "tier": "compatible"
+    },
+    "ssh-slaves":     {
+      "name": "Jenkins SSH Slaves plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "ssh-slaves",
+      "version": "1.23-SNAPSHOT",
+      "dependencies":       {
+        "credentials": "2.1.2",
+        "ssh-credentials": "1.6.1"
+      },
+      "scope": "fat",
+      "sha1": "GOarVFqHFbYqpO0oFgFNgSf8vQY=",
+      "tier": "verified"
+    },
+    "nectar-vmware":     {
+      "name": "CloudBees VMWare Autoscaling Plugin",
+      "groupId": "com.cloudbees.nectar",
+      "artifactId": "nectar-vmware",
+      "version": "4.3.7-SNAPSHOT",
+      "dependencies":       {
+        "durable-task": "1.3",
+        "nectar-license": "7.0",
+        "node-iterator-api": "1.0",
+        "ssh-slaves": "0.14"
+      },
+      "scope": "fat",
+      "sha1": "ykA3JX8VdGK8cSc/kE2hd6527i8=",
+      "tier": "proprietary"
+    },
+    "openshift-cli":     {
+      "name": "CloudBees OpenShift CLI Plugin",
+      "groupId": "com.cloudbees.jenkins.plugins",
+      "artifactId": "openshift-cli",
+      "version": "1.5-SNAPSHOT",
+      "dependencies":       {
+        "credentials": "2.1.12",
+        "nectar-license": "8.6",
+        "plain-credentials": "1.2"
+      },
+      "scope": "fat",
+      "sha1": "Au0q29AZxr2Qoz+lgji019+C4cc=",
+      "tier": "proprietary"
+    },
+    "operations-center-analytics-config":     {
+      "name": "Operations Center Analytics Configuration",
+      "groupId": "com.cloudbees.operations-center.common",
+      "artifactId": "operations-center-analytics-config",
+      "version": "2.73.0.3-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "t/Xm3Gv71gWFSuPapUpy6OfF2Ko=",
+      "tier": "proprietary"
+    },
+    "operations-center-analytics-reporter":     {
+      "name": "Operations Center Analytics Reporter",
+      "groupId": "com.cloudbees.operations-center.client",
+      "artifactId": "operations-center-analytics-reporter",
+      "version": "2.73.0.1",
+      "dependencies":       {
+        "async-http-client": "1.7.24.1",
+        "junit": "1.20",
+        "metrics": "3.1.2.9",
+        "operations-center-analytics-config": "2.73.0.1",
+        "operations-center-context": "2.73.0.1",
+        "unique-id": "2.1.2"
+      },
+      "optionalDependencies":       {
+        "workflow-cps": "2.17",
+        "workflow-job": "2.6"
+      },
+      "scope": "fat",
+      "sha1": "ce2XKL7UDzm4E42BcM2Q5HXfyn8=",
+      "tier": "proprietary"
+    },
+    "operations-center-cloud":     {
+      "name": "Operations Center Cloud",
+      "groupId": "com.cloudbees.operations-center.client",
+      "artifactId": "operations-center-cloud",
+      "version": "2.73.0.2-SNAPSHOT",
+      "dependencies":       {
+        "cloudbees-license": "9.14",
+        "durable-task": "1.12",
+        "mapdb-api": "1.0.9.0",
+        "nectar-license": "8.6",
+        "nectar-rbac": "5.8",
+        "node-iterator-api": "1.5",
+        "operations-center-client": "2.73.0.1",
+        "operations-center-context": "2.73.0.1"
+      },
+      "scope": "fat",
+      "sha1": "fJ8JFN1eCc8vwP3uBmwKSGbiPok=",
+      "tier": "proprietary"
+    },
+    "operations-center-openid-cse":     {
+      "name": "Operations Center OpenID Cluster Session Extension",
+      "groupId": "com.cloudbees.operations-center.common",
+      "artifactId": "operations-center-openid-cse",
+      "version": "1.8.111-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "Be405zS9FQzyyNUxUQNabqPDhl4=",
+      "tier": "proprietary"
+    },
+    "pam-auth":     {
+      "name": "PAM Authentication plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "pam-auth",
+      "version": "1.4-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "rzS2ob28E6TisdMKeND1zA0hdeM=",
+      "tier": "compatible"
+    },
+    "pipeline-build-step":     {
+      "name": "Pipeline: Build Step",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "pipeline-build-step",
+      "version": "2.6-SNAPSHOT",
+      "dependencies":       {
+        "workflow-api": "2.3",
+        "workflow-step-api": "2.3",
+        "workflow-support": "2.6"
+      },
+      "scope": "fat",
+      "sha1": "s8FvFBtDX3ztIRYRJON8KGIebUc=",
+      "tier": "compatible"
+    },
+    "pipeline-milestone-step":     {
+      "name": "Pipeline: Milestone Step",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "pipeline-milestone-step",
+      "version": "1.4-SNAPSHOT",
+      "dependencies":       {
+        "workflow-api": "2.11",
+        "workflow-step-api": "2.9"
+      },
+      "scope": "fat",
+      "sha1": "6v8S6XCXFQ2MdTRVXRtzTXDafNg=",
+      "tier": "compatible"
+    },
+    "secure-requester-whitelist":     {
+      "name": "Secure Requester Whitelist Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "secure-requester-whitelist",
+      "version": "1.3-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "VaKo6BvXQFzZ60zLoF4cMFDsdUk=",
+      "tier": "verified"
+    },
+    "skip-plugin":     {
+      "name": "CloudBees Skip Next Build Plugin",
+      "groupId": "com.cloudbees.nectar.plugins",
+      "artifactId": "skip-plugin",
+      "version": "4.1-SNAPSHOT",
+      "dependencies": {"nectar-license": "7.17"},
+      "optionalDependencies": {"cloudbees-folder": "5.11"},
+      "scope": "fat",
+      "sha1": "vtMX8yqxjmAcA8IrfEH008KxVnI=",
+      "tier": "proprietary"
+    },
+    "ssh-agent":     {
+      "name": "SSH Agent Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "ssh-agent",
+      "version": "1.16-SNAPSHOT",
+      "dependencies":       {
+        "bouncycastle-api": "1.0.2",
+        "credentials": "2.1.1",
+        "ssh-credentials": "1.11",
+        "workflow-step-api": "1.14.2"
+      },
+      "scope": "fat",
+      "sha1": "7GXKZIhQzbfirVgsvSFUgPlV22w=",
+      "tier": "compatible"
+    },
+    "suppress-stack-trace":     {
+      "name": "Stack Trace Suppression Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "suppress-stack-trace",
+      "version": "1.6-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "2jKAI4Vw6fNMsXdZ+pXU9w1LhKM=",
+      "tier": "compatible"
+    },
+    "wikitext":     {
+      "name": "CloudBees WikiText Security Plugin",
+      "groupId": "com.cloudbees.nectar.plugins",
+      "artifactId": "wikitext",
+      "version": "3.9-SNAPSHOT",
+      "dependencies": {"nectar-license": "7.1"},
+      "scope": "fat",
+      "sha1": "rJ3Ib6g2Nxw+rmMr2eAS+V50GKc=",
+      "tier": "proprietary"
+    },
+    "windows-slaves":     {
+      "name": "Windows Slaves Plugin",
+      "groupId": "org.jenkins-ci.plugins",
+      "artifactId": "windows-slaves",
+      "version": "1.3.2-SNAPSHOT",
+      "scope": "fat",
+      "sha1": "UxNjb6beLRRD76ai+m1rQ2P6wJU=",
+      "tier": "verified"
+    },
+    "workflow-aggregator":     {
+      "name": "Pipeline",
+      "groupId": "org.jenkins-ci.plugins.workflow",
+      "artifactId": "workflow-aggregator",
+      "version": "2.5",
+      "dependencies":       {
+        "pipeline-build-step": "2.4",
+        "pipeline-input-step": "2.5",
+        "pipeline-milestone-step": "1.3",
+        "pipeline-model-definition": "1.0",
+        "pipeline-stage-step": "2.2",
+        "pipeline-stage-view": "2.4",
+        "workflow-api": "2.8",
+        "workflow-basic-steps": "2.3",
+        "workflow-cps": "2.24",
+        "workflow-cps-global-lib": "2.5",
+        "workflow-durable-task-step": "2.8",
+        "workflow-job": "2.9",
+        "workflow-multibranch": "2.9.2",
+        "workflow-scm-step": "2.3",
+        "workflow-step-api": "2.7",
+        "workflow-support": "2.12"
+      },
+      "scope": "fat",
+      "sha1": "JYbEB7D4N73SO9/QfguTWWa1il4=",
+      "tier": "compatible"
+    }
+  },
+  "blacklist":   [
+    "amazon-aws-cli",
+    "bluesteel-master",
+    "castle",
+    "castle-core",
+    "castle-ebs",
+    "cloudbees-cloud-backup",
+    "cloudbees-credentials",
+    "cloudbees-enterprise-plugins",
+    "cloudbees-file-leak-detector",
+    "cloudbees-registration",
+    "operations-center-analytics",
+    "operations-center-analytics-dashboards",
+    "operations-center-analytics-feeder",
+    "operations-center-analytics-viewer",
+    "operations-center-elasticsearch-provider",
+    "operations-center-embedded-elasticsearch",
+    "operations-center-license",
+    "pse-analytics-dashboards",
+    "pse-cjoc-server-license",
+    "pse-config-info",
+    "tiger-client",
+    "visual-studio-online"
+  ],
+  "signature":   {
+    "correct_digest": "6v3wruazztDZZCM3R45LEHvmp/k=",
+    "certificates": ["MIIDyjCCArICCQDjhYDxdF9w9jANBgkqhkiG9w0BAQUFADCBpjELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExETAPBgNVBAcTCFNhbiBKb3NlMRgwFgYDVQQKEw9DbG91ZEJlZXMsIEluYy4xEDAOBgNVBAsTB0plbmtpbnMxGjAYBgNVBAMTEUtvaHN1a2UgS2F3YWd1Y2hpMScwJQYJKoZIhvcNAQkBFhhra2F3YWd1Y2hpQGNsb3VkYmVlcy5jb20wHhcNMTExMDIyMTgzMTM2WhcNMjExMDE5MTgzMTM2WjCBpjELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExETAPBgNVBAcTCFNhbiBKb3NlMRgwFgYDVQQKEw9DbG91ZEJlZXMsIEluYy4xEDAOBgNVBAsTB0plbmtpbnMxGjAYBgNVBAMTEUtvaHN1a2UgS2F3YWd1Y2hpMScwJQYJKoZIhvcNAQkBFhhra2F3YWd1Y2hpQGNsb3VkYmVlcy5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDVPr8iuS4BTVjKZ0PvZvfoCkBnNeqVsyjDO5XDdYeGPHbG3D8OIpHZQjgr9IeL+bUF3JEfPS0F0TmNSf0mzrHxGCRsVQcGsDClqFqVnUlG4b9ThcRckYVe+/Wl6DCrGTUI08Ivc7bpnxi+ZxeGtdCGEL6gNyw/t85qs/7JbTbAxXpRs+EWKcC6l8a7N8Uy5xgRxWzPfiF8wuLzrbrJCS0WYV3387eo9RmXqbEVeoAyD7hkcjJb17ZSFv6eJTn0K/Z9i8jmuTqZe6bN/YmP3y4r8tx4z2nx+qFVeJZ7pM7FyRlUAO1qPKjw0pDSGYzoXp3T/1PiBYI09EADQL4dpa5zAgMBAAEwDQYJKoZIhvcNAQEFBQADggEBAKx1keEJnlDHlHCsEEyFdmLxlYJ+6CSlrU9B/pJ7ufUuQJUfCYancmeO+8XSkDzN/3HvpKyWWmUWNlmVvbVnTVxfp3/Y4YshuNfyuP/gXOGoz/ZzQVoq+GJ4gaEr6VZgEv9DCfFQr5HhZQLj1Zc1oQaxB//YrBkw9Yhx7hHSW/qwyrqJEjzA0EEIixNfQm+qdYv4PR1Zzmue9XhGMXpQiymEYo90DJomBPVwVII1OimgIXtDgJQebAxPxvwfhodPNTCxit3zn8Z7I8iMrzHoMA4mk4OJPqwP6Gr4iD8+Fg/xO1T2CxZ4C7gLiQx/OnHCAGxZD2BmGQ9WzzriZ727tl4="],
+    "correct_signature": "qWMmKOGmBhahWb06+32xoDc8hza0NH0ssoudEQAEIT8hzbtPHVFARM+0oMPxyvZbDcS3Jma0xE8z3Y1SfPq3lskOjKzws0cMs/r1vWzgfGuM8XWmwKEYAxwTb/K0EDyvtrwubjHf1kNzvRLRthRCnLc7ML4L+XB7ymqxVDNWaTk1hJ3HK/5jDr5akrqs+SAp2H+Bj8WJFD+UiFxQMXeuIZJqOcaUElDJhC4Yn4WbbyXZatIYxJQ7YhRcEMI2hivAGlqKQyVnJR63R9FxA9KDlORABFy9fVB/JKddQpyBrPNkhxV8iSiBLVY3MHe+c2w1KBCQ3n5cFNnDuTDV6mol6g==",
+    "digest": "Yr87wIohm6aJsZjTwHML+E5in4Y=",
+    "signature": "nN3Or39G85qTVrOtKAtsjqtWnHvAxk+OjUQU+ZjwiiZUxuov60Haa85XHRL+n2toaFCNcdrsU0DuHmuYwOlHuR+RobIwz+66fg/cGIQrusRhOQp4jaTaVrt9JZJnW2jDz5nprNy9K9Wn6sel2RhGEpTeUn7apo4AcVQ86M95DE1QpoF3vycUfgkfBECyXwJPMYd5LpYyhOFeHJ/L3v04FST+1W7kdgzL6w7eoFd+tNfpDo/UG7TX/r4Vhx/7/fwJWU9S0k90s/zluhRtvucFEadcgDL1Y61/vF/BK7pvSyGxCJ6jlLrkiuf1bTrTPrA6ktfxVqZtLj2mkUGYdTvhyA=="
+  }
+}

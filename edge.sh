@@ -134,7 +134,7 @@ validate_arguments() {
         echo "WRONG: excludeGroupIds file doesn't exist" ; exit 1
     else
         if [ -n "$EXCLUDE_GROUPS_FILE" ] ; then
-            if [  -n "$EXCLUDE_GROUPS_FILE" -o `cat $EXCLUDE_GROUPS_FILE | wc -l` -gt 1  ] ; then
+            if [ `cat $EXCLUDE_GROUPS_FILE | wc -l` -gt 1  ] ; then
                 echo "WRONG: excludeGroupIds file cannot contains multilines" ; exit 1
             fi
         fi
@@ -319,4 +319,21 @@ closePME  ${PME}
 status=$(pme ${CURRENT} ${PME} "${EDGE}/pme.log" ${SETTINGS})
 pme=$?
 echo "Final PME stage - ${status}"
+
+# Verify PME vs each Envelope only if PME execution was success
+if [ $pme -eq 0 ] ; then
+    skipNullable=true
+    find . -name envelope.json -type f -not -path "**/generated-resources/*" -not -path "**/test/resource/*" | sort | while read envelope
+    do
+        echo "Verifying $(dirname $envelope)"
+        verify ${JSON} ${envelope} ${skipNullable}
+        if [ $? -ne 0 ] ; then
+            pme=1
+        else
+            echo "Verified $(dirname $envelope)"
+        fi
+    done
+fi
+
 exit $pme
+

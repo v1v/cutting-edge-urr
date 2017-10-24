@@ -1,0 +1,13 @@
+[
+    {
+        "groupId": "org.jenkins-ci.plugins",
+        "artifactId": "active-directory",
+        "version": "2.4",
+        "newVersion": "1.2-SNAPSHOT",
+        "url": "https://github.com/jenkinsci/active-directory-plugin",
+        "status": "success",
+        "description": "passed",
+        "envelope": "success",
+        "validate": "validated"
+    }
+]

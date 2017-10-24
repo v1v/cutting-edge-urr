@@ -333,7 +333,10 @@ EOT
 # Returns the exit code of the last command executed.
 #
 function closeJSON {
+
+    sed -i.bck '$ d' $1 # Workaround to allow json format without breaking it
     cat <<EOT >> $1
+    }
 ]
 EOT
 }
@@ -506,6 +509,9 @@ function addDependency {
 #
 function addJSONDependency {
     if [[ ${10} == *.json ]] ; then
+
+        single_line=$(echo $9 | sed 's/\\n/|/g')
+
         cat <<EOT >> ${10}
     {
         "groupId": "$1",
@@ -516,7 +522,7 @@ function addJSONDependency {
         "status": "$6",
         "description": "$7",
         "envelope": "$8",
-        "validate": "$9"
+        "validate": "${single_line}"
     },
 EOT
     fi
