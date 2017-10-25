@@ -62,6 +62,9 @@
 #       ./target/edge/report/verify.txt
 #			Plain text file with the status of the verify of each validated dependency
 #
+#       ./target/edge/report/diff.html
+#			HTML report with the diff of each pom transformation
+#
 # NOTE:
 #
 #		Output folder is related to the ${session.executionRootDirectory}
@@ -101,6 +104,7 @@ PME=${REPORT}/pom.xml.pme
 JSON=${REPORT}/dependencies.json
 HTML=${REPORT}/dependencies.html
 VERIFY=${REPORT}/verify.txt
+DIFF=${REPORT}/diff.html
 export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 
 ## Arguments
@@ -334,7 +338,7 @@ closeJSON ${JSON}
 closePME  ${PME}
 
 # Run the PME stuff
-status=$(pme ${CURRENT} ${PME} "${EDGE}/pme.log" ${SETTINGS})
+status=$(pme ${CURRENT} ${PME} "${EDGE}/pme.log" "${DIFF}" ${SETTINGS})
 pme=$?
 echo "Final PME stage - ${status}"
 

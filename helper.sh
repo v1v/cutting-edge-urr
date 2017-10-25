@@ -278,7 +278,8 @@ function validate {
 # $1 - root location
 # $2 - pme file
 # $3 - build output
-# $4 - settings
+# $4 - html diff report
+# $5 - settings
 #
 # Examples
 #
@@ -290,7 +291,8 @@ function pme {
     location=$1
     PME=$2
     output=$3
-    settings=$4
+    report=$4
+    settings=$5
 
     build_status=1
 
@@ -318,7 +320,7 @@ function pme {
         build_status=$?
 
         # Generate html diff
-        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o ${target}/diff.html >> ${output} 2>&1
+        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o ${report} >> ${output} 2>&1
 
         cleanLeftOvers $target $output
     fi
