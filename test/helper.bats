@@ -12,6 +12,10 @@ setup() {
     export NO_SCM_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export CONNECTION_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
     export TEMP_DIR_NEW=${TEMP_DIR}.new
+    export JSON_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+    export ENVELOPE_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+    export DIFFERENT_VERSION_JSON_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+
     cat <<EOT > $OVERRIDE_FILE
 [url]
     ant = overrided_url
@@ -42,6 +46,10 @@ EOT
 </project>
 EOT
 
+    # Using templates
+    cp */resource/verify/dependencies.json $JSON_FILE
+    cp */resource/verify/envelope.json $ENVELOPE_FILE
+    cp */resource/verify/different_version_dependencies.json $DIFFERENT_VERSION_JSON_FILE
 }
 
 teardown() {
@@ -52,33 +60,36 @@ teardown() {
     rm ${NO_SCM_POM_FILE}
     rm ${CONNECTION_POM_FILE}
     rm $EFFECTIVE_FILE
+    rm ${JSON_FILE}
+    rm ${ENVELOPE_FILE}
+    rm ${DIFFERENT_VERSION_JSON_FILE}
 }
 
 @test "Should return URL when queering Maven plugin" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/maven-plugin/maven-plugin-3.0/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "http://github.com/jenkinsci/maven-plugin"
 }
 
 @test "Should return overrided_url when quering ANT plugin in an existing override file" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/ant-plugin/ant-1.7/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "overrided_url"
 }
 
 @test "Should return unreachalbe when quering ace-editor plugin " {
     wget -q "https://raw.githubusercontent.com/jenkinsci/js-libs/master/ace-editor/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output ${CTE_UNREACHABLE}
 }
 
 @test "Should return scm when quering POM without SCM " {
-    run getURL ${NO_SCM_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${NO_SCM_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output ${CTE_SCM}
 }
 
 @test "Should return connection URL when quering POM scm " {
-    run getURL ${CONNECTION_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" ${OVERRIDE_FILE}
+    run getURL ${CONNECTION_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "git://github.com/jenkinsci/gradle-plugin.git"
 }
 
@@ -138,6 +149,15 @@ EOT
     assert_output 'git@github.com:cloudbees/repository.git'
     run transform 'git@github.com:cloudbees/cloudbees-aws-cli-plugin.git'
     assert_output 'git@github.com:cloudbees/cloudbees-aws-cli-plugin.git'
+}
+
+@test "Should return git+https when using public repos with git+git" {
+    run transform 'git://github.com/jenkinsci/project.git'
+    assert_output 'https://github.com/jenkinsci/project.git'
+    run transform 'git://github.com/jenkinsci/project'
+    assert_output 'https://github.com/jenkinsci/project'
+    run transform 'git://github.com/jenkinsci/project/asa'
+    assert_output 'https://github.com/jenkinsci/project'
 }
 
 @test "Should transform scm/connection urls" {
@@ -221,3 +241,60 @@ EOT
     run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_FAILED}"
 }
+
+@test "Should cleanLeftOvers" {
+    run cleanLeftOvers "${TEMP_DIR}" "/dev/null"
+    assert_output ""
+    [ "$status" -eq 0 ]
+
+    run cleanLeftOvers "${TEMP_DIR}/1" "/dev/null"
+    assert_output ""
+    [ "$status" -eq 0 ]
+}
+
+@test "Should not verify when no files" {
+    run verify "" ""
+    assert_output "${CTE_WARNING}"
+    [ "$status" -eq 1 ]
+
+    run verify "foo" "bar"
+    assert_output "${CTE_WARNING}"
+    [ "$status" -eq 1 ]
+
+    run verify "" "bar"
+    assert_output "${CTE_WARNING}"
+    [ "$status" -eq 1 ]
+
+    run verify "foo" ""
+    assert_output "${CTE_WARNING}"
+    [ "$status" -eq 1 ]
+
+    run verify "${JSON_FILE}" "${ENVELOPE_FILE}"
+    assert_output ""
+    [ "$status" -eq 0 ]
+}
+
+@test "Should verify when files" {
+    run verify "${JSON_FILE}" "${ENVELOPE_FILE}"
+    assert_output ""
+    [ "$status" -eq 0 ]
+
+    run verify "${DIFFERENT_VERSION_JSON_FILE}" "${ENVELOPE_FILE}"
+    assert_output "org.jenkins-ci.plugins:active-directory envelope-version '2.7-SNAPSHOT' doesn't match pme-version '1.2-SNAPSHOT'"
+    [ "$status" -eq 1 ]
+}
+
+@test "Should getJsonPropertyFromEnvelope" {
+    run getJsonPropertyFromEnvelope 'credentials' 'groupId' $ENVELOPE_FILE
+    assert_output "org.jenkins-ci.plugins"
+    [ "$status" -eq 0 ]
+
+    run getJsonPropertyFromEnvelope 'credentials' 'wrong' $ENVELOPE_FILE
+    assert_output "null"
+    [ "$status" -eq 0 ]
+
+    run getJsonPropertyFromEnvelope 'key' 'groupId' $ENVELOPE_FILE
+    assert_output "null"
+    [ "$status" -eq 0 ]
+}
+

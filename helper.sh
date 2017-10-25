@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # Helper file which contains the functions used by the edge.sh file
 #
@@ -14,12 +14,13 @@ source "$( dirname "${BASH_SOURCE[0]}" )/utils.sh"
 # $1 - POM
 # $2 - Effective POM
 # $3 - Repo absolute folder
-# $4 - Override properties
-# $5 - Settings
+# $4 - ssh git transformation
+# $5 - Override properties
+# $6 - Settings
 #
 # Examples
 #
-#   getURL "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" "./override.properties" "~/m2/settings.xml"
+#   getURL "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" true "./override.properties" "~/m2/settings.xml"
 #
 # Returns the github URL/unreachable/scm
 #
@@ -27,8 +28,9 @@ function getURL {
     pom=$1
     effective=$2
     repo=$3
-    override=$4
-    settings=$5
+    ssh_git=$4
+    override=$5
+    settings=$6
 
     # Validate mandatory ARGUMENTS
     if [ ! -f $pom ] ; then
@@ -66,7 +68,7 @@ function getURL {
         fi
 
         if [ -n "${url}" ] ; then
-            if isReachable ${url} ${SSH_GIT} ; then  # Sometimes URLs are not reachable
+            if isReachable ${url} ${ssh_git} ; then  # Sometimes URLs are not reachable
                 status=${url}
             else
                 status=${CTE_UNREACHABLE}
@@ -97,6 +99,9 @@ function transform {
 
     # Convert scm:git:git://github.com  and scm:git:git@github.com to https
     newurl=$(echo $url | sed -E 's#scm.*github.com(:|/)?#https://github.com/#')
+
+    # Convert git+git repos to git+https
+    newurl=$(echo $newurl | sed -E 's#git://github.com(:|/)?#https://github.com/#')
 
     # Convert repos to github.com/organisation/project
     newurl=$(echo $newurl | sed -Ene's#(.*github.com:?/?/?[^/]*/[^/]*).*#\1#p')
@@ -167,15 +172,15 @@ function buildDependency {
     recipes=$5
 
     FLAG_FILE=".status.flag"
-    MAVEN_FLAGS="-DskipTests=${skip} -Dfindbugs.skip=${skip} -Dmaven.test.skip=${skip} -Dmaven.javadoc.skip=true"
     cd ${repo}
-
-    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-
-    artifactId=$(getBuildProperty  ${repo} "project.artifactId" "name" "${settings}")
 
     # Cache previous build executions
     if [ ! -e $FLAG_FILE ] ; then
+        MAVEN_FLAGS="-DskipTests=${skip} -Dfindbugs.skip=${skip} -Dmaven.test.skip=${skip} -Dmaven.javadoc.skip=true"
+        [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+        artifactId=$(getBuildProperty  ${repo} "project.artifactId" "name" "${settings}")
+
         override_file="${recipes}/${artifactId}.build"
         if [ -e "${override_file}" ] ; then
             build_command=$(getOverridedProperty "${override_file}" build.command)
@@ -186,7 +191,7 @@ function buildDependency {
         [ $? -eq 0 ] && status=${CTE_PASSED} || status=${CTE_FAILED}
         echo $status > $FLAG_FILE
     fi
-    cat $FLAG_FILE
+    cat ${FLAG_FILE}
 }
 
 # Private: Query build properties independently what build system is used.
@@ -217,3 +222,192 @@ function getBuildProperty {
         fi
     fi
 }
+
+# Private: Validate envelope using the PME injection
+#
+# $1 - ga group:artifact
+# $2 - version new version
+# $3 - build_log
+# $4 - root location
+# $5 - settings
+#
+# Examples
+#
+#   validate "com.cloudbees:azure-cli" "1.2" "build.log" "./target" "settings.xml"
+#
+# Returns the exit code of the last command executed.
+#
+function validate {
+    ga=$1
+    version=$2
+    build_log=$3
+    location=$4
+    settings=$5
+
+    TARGET=${location}/target
+
+    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+    cd $location
+
+    mkdir -p $TARGET
+    if [ ! -e $TARGET/pom-manipulation-cli-2.12.jar ] ; then
+        wget -q http://central.maven.org/maven2/org/commonjava/maven/ext/pom-manipulation-cli/2.12/pom-manipulation-cli-2.12.jar  \
+             -O $TARGET/pom-manipulation-cli-2.12.jar
+    fi
+
+    cleanLeftOvers "${TARGET}" "${build_log}"
+
+    # Manipulate
+    java -jar $TARGET/pom-manipulation-cli-2.12.jar \
+            ${SETTINGS} \
+            -f pom.xml \
+            -DdependencyOverride.${ga}@*=${version} > ${build_log} 2>&1
+
+    # Validate envelope
+    mvn envelope:validate ${SETTINGS} >> ${build_log} 2>&1
+    build_status=$?
+    [ $build_status -eq 0 ] && status=${CTE_SUCCESS} || status=${CTE_WARNING}
+    cleanLeftOvers "${TARGET}" "${build_log}"
+    echo $status
+    return $build_status
+}
+
+# Private: Validate envelope and generate WAR plus the html diff
+#
+# $1 - root location
+# $2 - pme file
+# $3 - build output
+# $4 - settings
+#
+# Examples
+#
+#   pme "./" "pom.xml" "build.log" "settings.xml"
+#
+# Returns the exit code PME execution if PME file exists otherwise errorlevel 1
+#
+function pme {
+    location=$1
+    PME=$2
+    output=$3
+    settings=$4
+
+    build_status=1
+
+    target=${location}/target
+    cd ${location}
+    if [ -e ${PME} ] ; then
+        [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+        mvn install -f ${PME} ${SETTINGS} >> ${output} 2>&1
+
+        groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS})
+        artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
+        version=$(getPomProperty ${PME} "project.version" ${SETTINGS})
+
+        cleanLeftOvers $target $output
+
+        set -o pipefail
+        mvn -B install \
+            -DversionSuffix=edge \
+            -Ddebug \
+            -Denforcer.skip \
+            -DdependencyManagement=${groupId}:${artifactId}:${version} \
+            ${SETTINGS} >> ${output} 2>&1
+
+        build_status=$?
+
+        # Generate html diff
+        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o ${target}/diff.html >> ${output} 2>&1
+
+        cleanLeftOvers $target $output
+    fi
+    [ $build_status -eq 0 ] && echo ${CTE_SUCCESS} || echo ${CTE_WARNING}
+    return $build_status
+}
+
+# Private: Remove PME generated files to allow rerun the same process without
+#           cleaning the entire target folder
+#
+# $1 - target location (normally <root folder>/target)
+# $2 - output file
+#
+function cleanLeftOvers {
+    TARGET=$1
+    OUTPUT=$2
+    ## Clean leftovers
+    git checkout -- pom.xml products/  >> ${OUTPUT} 2>&1
+    [ -e ${TARGET}/pom-manip-ext-marker.txt ] && rm ${TARGET}/pom-manip-ext-marker.txt  >> ${OUTPUT} 2>&1 || true
+}
+
+
+# Public: Verify whether the final dependencies.json and envelope.json match.
+#          Each element from the envelope.json should match with the dependencies.json
+#           While each dependencies.json element might not match
+#
+# $1 - dependencies json
+# $2 - envelope.json (root location: ./products/*/target/*/WEB-INF/plugins/envelope.json)
+# $3 - whether to fail if nullable versions in the envelope
+#
+# Returns whether PME dependencies have been injected accordingly. Otherwise errorlevel 1 and
+# echo each broken dependency
+#
+function verify {
+    jsonFile=$1
+    envelopeFile=$2
+    skipNullable=${3:-false}
+
+    status=0
+    if [ ! -e "$jsonFile" -o ! -e "$envelopeFile" ] ; then
+        status=1
+        echo $CTE_WARNING
+    else
+        # For each element in the dependencies.json file
+        for row in $(cat ${jsonFile} | jq -r '.[] | @base64'); do
+            _jq() {
+                echo ${row} | base64 --decode | jq -r ${1}
+            }
+            notify=0
+            envelope=$(_jq '.envelope')
+            if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
+                groupId=$(_jq '.groupId')
+                artifactId=$(_jq '.artifactId')
+                newVersion=$(_jq '.newVersion')
+                envelopeVersion=$(getJsonPropertyFromEnvelope $artifactId 'version' $envelopeFile)
+                if [ "${newVersion}" != "${envelopeVersion}" ] ; then
+                    if [ "${envelopeVersion}" == "null" ] ; then
+                        if [ ! "$skipNullable" = true ] ; then
+                            status=1
+                            notify=1
+                        fi
+                    else
+                        status=1
+                        notify=1
+                    fi
+                fi
+                if [ $notify -eq 1 ] ; then
+                    echo "${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'"
+                fi
+            fi
+        done
+    fi
+    return $status
+}
+
+# Private: Given a particular envelope.json file and artifactId gets that particular property
+#          Each element from the envelope.json should match with the dependencies.json
+#           While each dependencies.json element might not match
+#
+# $1 - artifactId
+# #2 - property
+# $3 - envelope.json
+#
+# Returns the exit code of the last command executed. And echo the property value
+#
+function getJsonPropertyFromEnvelope {
+    artifactId=$1
+    property=$2
+    envelope=$3
+    echo $(cat ${envelope} | jq ".plugins[\"${artifactId}\"].${property}") | sed 's#"##g'
+}
+

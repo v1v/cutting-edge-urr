@@ -27,10 +27,14 @@ teardown() {
 }
 
 @test "Run edge with --settings option" {
+    source helper.sh
+    download https://github.com/dantheman213/java-hello-world-maven.git "$TEMP_FOLDER/maven"
+    cd "$TEMP_FOLDER/maven"
     run ${EDGE_CMD} --settings foo
     [ "$status" -eq 1 ]
-    run ${EDGE_CMD} --settings $TEMP_FILE
-    [ "$status" -eq 0 ]
+    # Disable since it's not supported as long as we run PME
+    #run ${EDGE_CMD} --settings $TEMP_FILE
+    #[ "$status" -eq 0 ]
 }
 
 @test "Run edge with --recipes option" {
@@ -38,6 +42,34 @@ teardown() {
     [ "$status" -eq 1 ]
     run ${EDGE_CMD} --recipes $TEMP_FILE
     [ "$status" -eq 1 ]
-    run ${EDGE_CMD} --recipes $TEMP_FOLDER
-    [ "$status" -eq 0 ]
+    # Disable since it's not supported as long as we run PME
+    #run ${EDGE_CMD} --recipes $TEMP_FOLDER
+    #[ "$status" -eq 0 ]
+}
+
+@test "Run edge with --xa option" {
+    run ${EDGE_CMD} -xa foo
+    [ "$status" -eq 1 ]
+
+    cat <<EOT > $TEMP_FILE
+a
+b
+c
+EOT
+    run ${EDGE_CMD} -xa $TEMP_FILE
+    [ "$status" -eq 1 ]
+}
+
+
+@test "Run edge with --xg option" {
+    run ${EDGE_CMD} -xg foo
+    [ "$status" -eq 1 ]
+
+    cat <<EOT > $TEMP_FILE
+a
+b
+c
+EOT
+    run ${EDGE_CMD} -xg $TEMP_FILE
+    [ "$status" -eq 1 ]
 }

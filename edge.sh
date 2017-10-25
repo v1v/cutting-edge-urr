@@ -78,6 +78,7 @@
 #		xmlstarlet binary
 #		maven 3.3+
 #		git 2+
+#		jq
 #
 # KNOWN ISSUES:
 #
@@ -123,13 +124,34 @@ validate_arguments() {
     fi
     if [ ! -e $EXCLUDE_ARTIFACTS_FILE ]; then
         echo "WRONG: excludeArtifactIds file doesn't exist" ; exit 1
+    else
+        if [ -n "$EXCLUDE_ARTIFACTS_FILE" ] ; then
+            if [ `cat $EXCLUDE_ARTIFACTS_FILE | wc -l` -gt 1 ] ; then
+                echo "WRONG: excludeArtifactIds file cannot contains multilines" ; exit 1
+            fi
+        fi
     fi
     if [ ! -e $EXCLUDE_GROUPS_FILE ]; then
         echo "WRONG: excludeGroupIds file doesn't exist" ; exit 1
+    else
+        if [ -n "$EXCLUDE_GROUPS_FILE" ] ; then
+            if [ `cat $EXCLUDE_GROUPS_FILE | wc -l` -gt 1  ] ; then
+                echo "WRONG: excludeGroupIds file cannot contains multilines" ; exit 1
+            fi
+        fi
     fi
     if [ ! -d $RECIPES_FOLDER ]; then
         echo "WRONG: recipes folder doesn't exist" ; exit 1
     fi
+}
+
+validate_dependencies() {
+    for tool in jq java mvn git xmlstarlet; do
+        if ! command -v ${tool} >/dev/null ; then
+            echo "MISSING ${tool}"
+            exit 1
+        fi
+    done
 }
 
 # Public: Maven settings.xml file to be used, file path based.
@@ -178,7 +200,7 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 validate_arguments
-
+validate_dependencies
 ###############################################################################
 
 function initialise {
@@ -244,16 +266,23 @@ do
     repo="${EDGE}/$(basename ${pom})"
     effective=${pom}.effective
     newVersion=${CTE_NONE}
+    envelope=${CTE_NONE}
+    message=${CTE_NONE}
 
     # Get URL
-    url=$(getURL ${pom} ${effective} "${repo}" "${OVERRIDE_FILE}" "${SETTINGS}")
+    url=$(getURL ${pom} ${effective} "${repo}" "${SSH_GIT}" "${OVERRIDE_FILE}" "${SETTINGS}")
     echo "     getURL stage - ${url}"
+
+    groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
+    artifactId=$(getPomProperty ${effective} "project.artifactId" ${SETTINGS})
+
     # If it's found then
     if [ "$url" != "${CTE_UNREACHABLE}" -a "$url" != "${CTE_SCM}" ] ; then
         # Transform URL to be able to use it within rosie and also support multimodule maven projects
         url=$(transform $url)
         echo "     transform stage - ${url}"
         repo="${EDGE}/$(basename ${url})"
+
         download=$(download ${url} ${repo})
         echo "     download stage - ${download}"
         if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
@@ -261,7 +290,19 @@ do
             description=$(buildDependency ${repo} ${build_log} ${SETTINGS} ${SKIP_TESTS} "${RECIPES_FOLDER}")
             newVersion=$(getBuildProperty  ${repo} "project.version" "version" "${SETTINGS}")
             echo "     buildDependency stage - ${description}"
-            [ "${description}" == "${CTE_PASSED}" ] && state=${CTE_SUCCESS} || state=${CTE_WARNING}
+            if [ "${description}" == "${CTE_PASSED}" ] ; then
+                state=${CTE_SUCCESS}
+                validate_log=${build_log}.validate
+                envelope=$(validate ${groupId}:${artifactId} ${newVersion} ${validate_log} ${CURRENT} "${SETTINGS}")
+                echo "     validate envelope stage - ${envelope}"
+                if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
+                    message="validated"
+                else
+                    message=$(analyseTopological ${validate_log})
+                fi
+            else
+                state=${CTE_WARNING}
+            fi
         else
             description=${CTE_UNREACHABLE}
             state=${CTE_DANGER}
@@ -272,11 +313,9 @@ do
     fi
 
     # Get GAVC
-    groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
-    artifactId=$(getPomProperty ${effective} "project.artifactId" ${SETTINGS})
     version=$(getPomProperty ${effective} "project.version" ${SETTINGS})
 
-    notify ${groupId} ${artifactId} ${version} ${newVersion} "${url}" ${state} ${description} ${HTML} ${JSON} ${PME}
+    notify "${groupId}" "${artifactId}" "${version}" "${newVersion}" "${url}" "${state}" "${description}" "${envelope}" "${message}" "${HTML}" "${JSON}" "${PME}"
     echo "     notify stage - ${state}"
     echo "     'old GAV' - ${groupId}:${artifactId}:${version} 'new GAV' - ${groupId}:${artifactId}:${newVersion}"
     let "index++"
@@ -285,3 +324,27 @@ done
 closeHTML ${HTML}
 closeJSON ${JSON}
 closePME  ${PME}
+
+# Run the PME stuff
+status=$(pme ${CURRENT} ${PME} "${EDGE}/pme.log" ${SETTINGS})
+pme=$?
+echo "Final PME stage - ${status}"
+
+# Verify PME vs each Envelope only if PME execution was success
+if [ $pme -eq 0 ] ; then
+    skipNullable=true
+    find . -name envelope.json -type f -not -path "**/generated-resources/*" -not -path "**/test/resource/*" | sort | while read file
+    do
+        verify ${JSON} ${file} ${skipNullable}
+        if [ $? -ne 0 ] ; then
+            pme=1
+            echo "     Verifying $file - failed"
+        else
+            echo "     Verifying $file - passed"
+        fi
+    done
+fi
+
+echo "Verify stage - ${pme}"
+exit $pme
+

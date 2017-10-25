@@ -2,6 +2,7 @@
 
 load 'libs/bats-support/load'
 load 'libs/bats-assert/load'
+load 'libs/bats-file/load'
 
 setup() {
     source utils.sh
@@ -33,7 +34,9 @@ EOT
     "newVersion": "newversion",
     "url": "url",
     "status": "status",
-    "description": "description"
+    "description": "description",
+    "envelope": "envelope",
+    "validate": "validate"
 },
 EOT
     cat <<EOT > $LI_FILE
@@ -43,6 +46,7 @@ EOT
             <span class="badge badge-pill badge-default">default</span>
             <span class="badge badge-pill badge-info">info</span>
             <span class="badge badge-pill badge-badge">description</span>
+            <span class="badge badge-pill badge-envelope">validate</span>
         </div>
     </li>
 EOT
@@ -56,7 +60,7 @@ EOT
 }
 
 teardown() {
-    rm ${TEMP_FILE}
+    rm ${TEMP_FILE}*
     rm ${JSON_FILE}
     rm ${DEPENDENCY_FILE}
     rm ${LI_FILE}
@@ -103,33 +107,79 @@ EOT
 }
 
 @test "Should add json element" {
-    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" $TEMP_FILE
+    # Without the json extension
+    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "validate" ${TEMP_FILE}
     run diff $JSON_FILE $TEMP_FILE
+    refute_output ''
+    # With the json extension
+    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "validate" ${TEMP_FILE}.json
+    run diff -w $JSON_FILE ${TEMP_FILE}.json
+    assert_output ''
+
+    # Multiline
+    cat <<EOT > $TEMP_FILE
+{
+    "groupId": "group",
+    "artifactId": "artifact",
+    "version": "version",
+    "newVersion": "newversion",
+    "url": "url",
+    "status": "status",
+    "description": "description",
+    "envelope": "envelope",
+    "validate": "dep0|dep1"
+},
+EOT
+    rm ${TEMP_FILE}.json
+    addJSONDependency "group" "artifact" "version" "newversion" "url" "status" "description" "envelope" "dep0\ndep1" ${TEMP_FILE}.json
+    run diff -w $TEMP_FILE ${TEMP_FILE}.json
     assert_output ''
 }
 
 @test "Should add pom dependency" {
+    # Without the xml extension
     addDependency "group" "artifact" "version" $TEMP_FILE
     run diff $DEPENDENCY_FILE $TEMP_FILE
+    refute_output ''
+    # With the xml extension
+    addDependency "group" "artifact" "version" ${TEMP_FILE}.xml
+    run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.xml
+    assert_output ''
+    # With the pme extension
+    addDependency "group" "artifact" "version" ${TEMP_FILE}.pme
+    run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.pme
     assert_output ''
 }
 
 @test "Should add li element" {
-    li "name" "default" "info" "badge" "description" $TEMP_FILE
+    # Without the html extension
+    li "name" "default" "info" "badge" "description" "envelope" "validate" $TEMP_FILE
     run diff $LI_FILE $TEMP_FILE
+    refute_output ''
+    # With the html extension
+    li "name" "default" "info" "badge" "description" "envelope" "validate" ${TEMP_FILE}.html
+    run diff -w $LI_FILE ${TEMP_FILE}.html
     assert_output ''
 }
 
 @test "Should generate dependency when status is success" {
-    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "/tmp/null" "/tmp/null" $TEMP_FILE
-    run diff $DEPENDENCY_FILE $TEMP_FILE
+    # Without the xml extension
+    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}
+    run diff $DEPENDENCY_FILE ${TEMP_FILE}
+    refute_output ''
+    # With the xml extension
+    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml
+    run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.xml
     assert_output ''
 }
 
 @test "Should not generate dependency when status is not success" {
-    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "/tmp/null" "/tmp/null" $TEMP_FILE
-    run diff $EMPTY_FILE $TEMP_FILE
-    assert_output ''
+    # Without the xml extension
+    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" ${TEMP_DIR}/new
+    assert_file_not_exist ${TEMP_DIR}/new
+    # With the xml extension
+    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml
+    assert_file_not_exist ${TEMP_FILE}.xml
 }
 
 @test "Should getPomProperty property given a pom" {
@@ -141,6 +191,11 @@ EOT
 
     run getPomProperty $WRONG_POM_FILE "project.version"
     refute_output 'version'
+
+    export _JAVA_OPTIONS="-Xmx1g"
+    run getPomProperty $WRONG_POM_FILE "project.version"
+    refute_output '_JAVA_OPTIONS'
+    unset _JAVA_OPTIONS
 }
 
 @test "Should getGradleProperty property given gradle project" {
@@ -155,6 +210,11 @@ EOT
 
     run getGradleProperty $WRONG_POM_FILE "name"
     refute_output 'gradle-plugin'
+
+    export _JAVA_OPTIONS="-Xmx1g"
+    run getGradleProperty ${TEMP_DIR}/gradle-plugin "name"
+    refute_output '_JAVA_OPTIONS'
+    unset _JAVA_OPTIONS
 }
 
 @test "Should get getXMLProperty given a pom" {
@@ -183,4 +243,15 @@ EOT
     assert_output "git@github.com:user/project"
     run convertHttps2Git "git@github.com:user/project.git"
     assert_output "git@github.com:user/project.git"
+}
+
+@test "Should analyseTopological when filtering topological errors" {
+    cat <<EOT > $TEMP_FILE
+[ERROR] Plugin [nodejs]
+ERROR Plugin [nodejs]
+[ERROR] plugin [nodejs]
+[INFO] Plugin [nodejs]
+EOT
+    run analyseTopological $TEMP_FILE
+    assert_output ' [nodejs]'
 }
