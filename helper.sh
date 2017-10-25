@@ -390,9 +390,13 @@ function verify {
                     fi
                 fi
                 if [ $notify -eq 1 ] ; then
-                    echo "WARN: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'" | tee -a ${report}
+                    if [ $status -eq 1 ] ; then
+                        echo "WARN: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'" | tee -a ${report}
+                    else
+                        echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}' since it's nullable" >> ${report}
+                    fi
                 else
-                    echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' matches pme-version '${newVersion}' or it's nullable" >> ${report}
+                    echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' matches pme-version '${newVersion}'" >> ${report}
                 fi
             fi
         done
