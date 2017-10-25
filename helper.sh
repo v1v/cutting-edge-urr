@@ -278,7 +278,8 @@ function validate {
 # $1 - root location
 # $2 - pme file
 # $3 - build output
-# $4 - settings
+# $4 - html diff report
+# $5 - settings
 #
 # Examples
 #
@@ -290,7 +291,8 @@ function pme {
     location=$1
     PME=$2
     output=$3
-    settings=$4
+    report=$4
+    settings=$5
 
     build_status=1
 
@@ -318,7 +320,7 @@ function pme {
         build_status=$?
 
         # Generate html diff
-        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o ${target}/diff.html >> ${output} 2>&1
+        git diff -U9999999 -u . | pygmentize -l diff -f html -O full -o ${report} >> ${output} 2>&1
 
         cleanLeftOvers $target $output
     fi
@@ -347,7 +349,8 @@ function cleanLeftOvers {
 #
 # $1 - dependencies json
 # $2 - envelope.json (root location: ./products/*/target/*/WEB-INF/plugins/envelope.json)
-# $3 - whether to fail if nullable versions in the envelope
+# $3 - verify.html generate html report
+# $4 - whether to fail if nullable versions in the envelope
 #
 # Returns whether PME dependencies have been injected accordingly. Otherwise errorlevel 1 and
 # echo each broken dependency
@@ -355,7 +358,8 @@ function cleanLeftOvers {
 function verify {
     jsonFile=$1
     envelopeFile=$2
-    skipNullable=${3:-false}
+    report=${3}
+    skipNullable=${4:-false}
 
     status=0
     if [ ! -e "$jsonFile" -o ! -e "$envelopeFile" ] ; then
@@ -386,7 +390,13 @@ function verify {
                     fi
                 fi
                 if [ $notify -eq 1 ] ; then
-                    echo "${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'"
+                    if [ $status -eq 1 ] ; then
+                        echo "WARN: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'" | tee -a ${report}
+                    else
+                        echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}' since it's nullable" >> ${report}
+                    fi
+                else
+                    echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' matches pme-version '${newVersion}'" >> ${report}
                 fi
             fi
         done

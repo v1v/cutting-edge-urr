@@ -253,35 +253,36 @@ EOT
 }
 
 @test "Should not verify when no files" {
-    run verify "" ""
+    run verify "" "" "/dev/null"
     assert_output "${CTE_WARNING}"
     [ "$status" -eq 1 ]
 
-    run verify "foo" "bar"
+    run verify "foo" "bar" "/dev/null"
     assert_output "${CTE_WARNING}"
     [ "$status" -eq 1 ]
 
-    run verify "" "bar"
+    run verify "" "bar" "/dev/null"
     assert_output "${CTE_WARNING}"
     [ "$status" -eq 1 ]
 
-    run verify "foo" ""
+    run verify "foo" "" "/dev/null"
     assert_output "${CTE_WARNING}"
     [ "$status" -eq 1 ]
 
-    run verify "${JSON_FILE}" "${ENVELOPE_FILE}"
+    run verify "${JSON_FILE}" "${ENVELOPE_FILE}" "/dev/null"
     assert_output ""
     [ "$status" -eq 0 ]
 }
 
 @test "Should verify when files" {
-    run verify "${JSON_FILE}" "${ENVELOPE_FILE}"
+    run verify "${JSON_FILE}" "${ENVELOPE_FILE}" "/dev/null"
     assert_output ""
     [ "$status" -eq 0 ]
 
-    run verify "${DIFFERENT_VERSION_JSON_FILE}" "${ENVELOPE_FILE}"
-    assert_output "org.jenkins-ci.plugins:active-directory envelope-version '2.7-SNAPSHOT' doesn't match pme-version '1.2-SNAPSHOT'"
+    run verify "${DIFFERENT_VERSION_JSON_FILE}" "${ENVELOPE_FILE}" "${TEMP_FILE}"
     [ "$status" -eq 1 ]
+    run cat ${TEMP_FILE}
+    assert_output "WARN: org.jenkins-ci.plugins:active-directory envelope-version '2.7-SNAPSHOT' doesn't match pme-version '1.2-SNAPSHOT'"
 }
 
 @test "Should getJsonPropertyFromEnvelope" {
