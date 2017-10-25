@@ -44,20 +44,23 @@
 #
 # OUTPUT:
 #
-#       ./target/pom.xml.pme
+#       ./target/edge/report/pom.xml.pme
 #			The PME file to be used when running URR with the latest versions
 #
-#       ./target/${dependency}.log
+#       ./target/edge/${dependency}.log
 #			Build output of each dependency
 #
-#       ./target/${dependency_repo}/.status.flag
+#       ./target/edge/${dependency_repo}/.status.flag
 #			Flag file to let know whether that project has been built previously and its status (passed, failed). This more related to multimodule maven projects.
 #
-#       ./target/dependencies.json
+#       ./target/edge/report/dependencies.json
 #			JSON file format with the status of each dependency
 #
-#       ./target/dependencies.html
-#			HTML report
+#       ./target/edge/report/dependencies.html
+#			HTML report with the status of all the dependencies
+#
+#       ./target/edge/report/verify.txt
+#			Plain text file with the status of the verify of each validated dependency
 #
 # NOTE:
 #
@@ -92,10 +95,12 @@ source "$( dirname "${BASH_SOURCE[0]}" )/helper.sh"
 ## Variables
 CURRENT=$(pwd)
 EDGE=${CURRENT}/target/edge
-PME=${CURRENT}/target/pom.xml.pme
-JSON=${CURRENT}/target/dependencies.json
-HTML=${CURRENT}/target/dependencies.html
+REPORT=${EDGE}/report
 UNIQUE_POMS=${EDGE}/poms
+PME=${REPORT}/pom.xml.pme
+JSON=${REPORT}/dependencies.json
+HTML=${REPORT}/dependencies.html
+VERIFY=${REPORT}/verify.txt
 export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 
 ## Arguments
@@ -234,12 +239,15 @@ function initialise {
         find . -name *.hpi -delete
 
         # In some cases the root target folder is not created when using some exclude options
-        mkdir -p ${EDGE}
+        mkdir -p ${REPORT}
 
         echo "Preparing reports..."
         openHTML ${HTML}
         openJSON ${JSON}
         openPME  ${PME}
+    else
+        # Forcing to create the report folder in case the incremental execution didn't go through it yet
+        mkdir -p ${REPORT}
     fi
 
 }
@@ -335,7 +343,7 @@ if [ $pme -eq 0 ] ; then
     skipNullable=true
     find . -name envelope.json -type f -not -path "**/generated-resources/*" -not -path "**/test/resource/*" | sort | while read file
     do
-        verify ${JSON} ${file} ${skipNullable}
+        verify ${JSON} ${file} ${skipNullable} ${VERIFY}
         if [ $? -ne 0 ] ; then
             pme=1
             echo "     Verifying $file - failed"

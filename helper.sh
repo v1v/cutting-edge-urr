@@ -347,7 +347,8 @@ function cleanLeftOvers {
 #
 # $1 - dependencies json
 # $2 - envelope.json (root location: ./products/*/target/*/WEB-INF/plugins/envelope.json)
-# $3 - whether to fail if nullable versions in the envelope
+# $3 - verify.html generate html report
+# $4 - whether to fail if nullable versions in the envelope
 #
 # Returns whether PME dependencies have been injected accordingly. Otherwise errorlevel 1 and
 # echo each broken dependency
@@ -355,7 +356,8 @@ function cleanLeftOvers {
 function verify {
     jsonFile=$1
     envelopeFile=$2
-    skipNullable=${3:-false}
+    report=${3}
+    skipNullable=${4:-false}
 
     status=0
     if [ ! -e "$jsonFile" -o ! -e "$envelopeFile" ] ; then
@@ -386,7 +388,9 @@ function verify {
                     fi
                 fi
                 if [ $notify -eq 1 ] ; then
-                    echo "${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'"
+                    echo "WARN: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'" | tee -a ${report}
+                else
+                    echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' matches pme-version '${newVersion}' or it's nullable" >> ${report}
                 fi
             fi
         done
