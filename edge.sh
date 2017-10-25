@@ -338,7 +338,7 @@ closeJSON ${JSON}
 closePME  ${PME}
 
 # Run the PME stuff
-status=$(pme ${CURRENT} ${PME} "${EDGE}/pme.log" "${DIFF}" ${SETTINGS})
+status=$(pme ${CURRENT} ${PME} "${REPORT}/pme.log" "${DIFF}" ${SETTINGS})
 pme=$?
 echo "Final PME stage - ${status}"
 
