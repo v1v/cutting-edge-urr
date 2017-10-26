@@ -11,41 +11,34 @@ source "$( dirname "${BASH_SOURCE[0]}" )/utils.sh"
 
 # Private: Transform dependency and return its github url
 #
-# $1 - POM
-# $2 - Effective POM
-# $3 - Repo absolute folder
-# $4 - ssh git transformation
-# $5 - Override properties
-# $6 - Settings
+# $1 - Effective POM
+# $2 - Repo absolute folder
+# $3 - ssh git transformation
+# $4 - Override properties
+# $5 - Settings
 #
 # Examples
 #
-#   getURL "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" true "./override.properties" "~/m2/settings.xml"
+#   getURL  "azure-pom-effective.xml" "./target/azure" true "./override.properties" "~/m2/settings.xml"
 #
 # Returns the github URL/unreachable/scm
 #
 function getURL {
-    pom=$1
-    effective=$2
-    repo=$3
-    ssh_git=$4
-    override=$5
-    settings=$6
+    effective=$1
+    repo=$2
+    ssh_git=$3
+    override=$4
+    settings=$5
 
     # Validate mandatory ARGUMENTS
-    if [ ! -f $pom ] ; then
-        echo "error"
-        exit 1
+    if [ ! -f $effective ] ; then
+        echo $CTE_FAILED
+        return 1
     fi
 
     build_log=${repo}.log
 
-    # Normalise packaging issue
-    normalisePackagingIssue ${pom}
-
-    # Get effective-pom
     [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-    mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} >>${build_log} 2>&1
 
     # Get effective artifact
     artifactId=$(getPomProperty ${effective} "project.artifactId" ${settings})
@@ -81,6 +74,40 @@ function getURL {
     echo ${status}
 }
 
+# Public: Get Effective POM
+#
+# $1 - POM
+# $2 - Effective POM
+# $3 - Repo absolute folder
+# $4 - Settings
+#
+# Examples
+#
+#   getEffectivePom "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" "~/m2/settings.xml"
+#
+# Returns the result of the last command
+#
+function getEffectivePom {
+    pom=$1
+    effective=$2
+    repo=$3
+    settings=$4
+
+    # Validate mandatory ARGUMENTS
+    if [ ! -f $pom ] ; then
+        echo $CTE_FAILED
+        return 1
+    fi
+
+    build_log=${repo}.log
+
+    # Normalise packaging issue
+    normalisePackagingIssue ${pom}
+
+    # Get effective-pom
+    [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+    mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} >>${build_log} 2>&1
+}
 
 # Private: Transform github urls therefore private repos are accessible
 #
