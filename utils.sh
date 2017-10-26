@@ -64,10 +64,12 @@ function getGradleProperty {
 #
 #   getXMLProperty "pom.xml" "scm/url"
 #
-# Returns the exit code of the last command executed.
+# Returns the exit code of the last command executed and print the property value
 #
 function getXMLProperty {
-    xmlstarlet pyx $1 | grep -v ^A | xmlstarlet p2x | xmlstarlet sel -t -v $2
+    set -o pipefail
+    property=$(xmlstarlet pyx $1 | grep -v ^A | xmlstarlet p2x | xmlstarlet sel -t -v $2)
+    [ $? -eq 0 ] && echo $property || return 1
 }
 
 # Public: Get the overrided property given a property files and the key.
@@ -83,7 +85,10 @@ function getXMLProperty {
 #
 function getOverridedProperty {
     if [ -e $1 ] ; then
-        git config --file=$1 --get $2
+        property=$(git config --file=$1 --get $2 2>&1)
+        [ $? -eq 0 ] && echo $property || return 1
+    else
+        return 1
     fi
 }
 

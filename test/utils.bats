@@ -219,10 +219,13 @@ EOT
 
 @test "Should get getXMLProperty given a pom" {
     run getXMLProperty $POM_FILE "/project/artifactId"
+    [ "$status" -eq 0 ]
     assert_output 'artifact'
     run getXMLProperty $POM_FILE "//artifactId"
+    [ "$status" -eq 0 ]
     assert_output 'artifact'
     run getXMLProperty $WRONG_POM_FILE "//artifactId"
+    [ "$status" -eq 1 ]
     assert_output --partial 'Premature end of data'
 }
 
@@ -254,4 +257,21 @@ ERROR Plugin [nodejs]
 EOT
     run analyseTopological $TEMP_FILE
     assert_output ' [nodejs]'
+}
+
+@test "Should getOverridedProperty" {
+    cat <<EOT > $TEMP_FILE
+[url]
+
+    key = value
+EOT
+    run getOverridedProperty ${TEMP_FILE} url.key
+    [ "$status" -eq 0 ]
+    assert_output 'value'
+    run getOverridedProperty ${TEMP_FILE} url. @
+    [ "$status" -eq 1 ]
+    assert_output ''
+    run getOverridedProperty "null" url.key
+    [ "$status" -eq 1 ]
+    assert_output ''
 }
