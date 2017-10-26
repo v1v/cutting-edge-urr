@@ -447,7 +447,7 @@ function getJsonPropertyFromEnvelope {
     echo $(cat ${envelope} | jq ".plugins[\"${artifactId}\"].${property}") | sed 's#"##g'
 }
 
-# Private: Given a particular GA it returns the latest release version
+# Public: Given a particular GA it returns the latest release version
 #
 # $1 - repository
 # $2 - groupId
@@ -481,4 +481,46 @@ function getNewLightVersion {
         echo $CTE_NONE
         return 1
     fi
+}
+
+# Public: Copy dependencies
+#
+# $1 - excludeArtifacts
+# $2 - excludeGroups
+# $3 - settings
+#
+# Returns the result of the latest command
+#
+function copyDependencies {
+    current=$1
+    excludeArtifacts=$2
+    excludeGroups=$3
+    settings=$4
+
+    cd $current
+    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+    mvn -B ${SETTINGS} clean org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies \
+                -Dmdep.copyPom \
+                -DincludeTypes=hpi \
+                ${excludeArtifacts} \
+                ${excludeGroups} > /dev/null
+}
+
+# Public: Get the latest releases from the remote repos
+#
+# $1 - current
+# $2 - settings
+#
+# Returns the result of the latest command
+#
+function getLatestReleases {
+    current=$1
+    settings=$2
+
+    cd $current
+    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+    mvn -B ${SETTINGS} org.codehaus.mojo:versions-maven-plugin:2.5:use-latest-releases > /dev/null
+    cleanLeftOvers $current "/dev/null"
 }
