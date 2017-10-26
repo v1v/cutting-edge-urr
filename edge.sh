@@ -9,8 +9,8 @@
 #       Edge retrieves each pom dependency based on some exclude filters then:
 #
 #		1) checkout
-#		2) build with or without tests
-#		3) install the new snapshot locally
+#		2) build with or without tests or skip it
+#		3) install the new snapshot locally or skip it
 #		4) create a PME file to be injected in the parent pom.
 #		5) generate a html/json report with the status of each dependency.
 #
@@ -41,6 +41,9 @@
 #
 #       -(N)S/--(no-)ssh
 #			Whether to convert git+https urls to git+ssh in order to allow git clone from private repositories using git+ssh agents. Default: true
+#
+#       -(N)L/--(no-)light
+#			Whether to skip the build install and use the latest release version of each plugin. Default: false
 #
 # OUTPUT:
 #
@@ -111,15 +114,16 @@ export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 display_help() {
     echo "Usage: $0 [option...]" >&2
     echo
-    echo "   -s,  --settings           Maven settings.xml file fullpath based."
-    echo "   -o,  --override           Override scm urls file based on key=value tuples."
-    echo "   -xa, --exclude-artifacts  File based on comma separated list of ArtifactId Names to exclude."
-    echo "   -xg, --exclude-groups     File based on comma separated list of GroupId Names to exclude."
-    echo "   -r,  --recipes            Folder with the build recipes to be override if required."
-    echo "   -(N)X,  --(no-)skip-test          Whether to skip tests when installing those dependencies locally."
-    echo "   -(N)I,  --(no-)incremental        Whether to clean or start from the previous execution."
-    echo "   -(N)S,  --(no-)ssh                Whether to transform git urls to git+ssh to allow access to private repos."
-    echo "   -h,  --help               Help."
+    echo "   -s,  --settings            Maven settings.xml file fullpath based."
+    echo "   -o,  --override            Override scm urls file based on key=value tuples."
+    echo "   -xa, --exclude-artifacts   File based on comma separated list of ArtifactId Names to exclude."
+    echo "   -xg, --exclude-groups      File based on comma separated list of GroupId Names to exclude."
+    echo "   -r,  --recipes             Folder with the build recipes to be override if required."
+    echo "   -(N)X,  --(no-)skip-test   Whether to skip tests when installing those dependencies locally."
+    echo "   -(N)I,  --(no-)incremental Whether to clean or start from the previous execution."
+    echo "   -(N)S,  --(no-)ssh         Whether to transform git urls to git+ssh to allow access to private repos."
+    echo "   -(N)L,  --(no-)light       Whether to use latest available releases or build each plugin."
+    echo "   -h,  --help                Help."
     echo
     exit 0
 }
@@ -179,6 +183,8 @@ SKIP_TESTS=true
 INCREMENTAL=true
 # Public: Whether to use git+ssh rather than git+https. This is required to use Pipeline within the CloudBees organisation.
 SSH_GIT=true
+# Public: Whether to use the latest release avialable or build/install locally.
+LIGHT=false
 
 if [ "$#" -eq 0 ]; then
     echo "INFO: Using default values"
@@ -198,9 +204,11 @@ case $key in
     -X|--skip-test) SKIP_TESTS=true; shift 1;;
     -I|--incremental) INCREMENTAL=true; shift 1;;
     -S|--ssh) SSH_GIT=true; shift 1;;
+    -L|--light) LIGHT=true; shift 1;;
     -NX|--no-skip-test) SKIP_TESTS=false; shift 1;;
     -NI|--no-incremental) INCREMENTAL=false; shift 1;;
     -NS|--no-ssh) SSH_GIT=false; shift 1;;
+    -NL|--no-light) light=false; shift 1;;
     *) # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift ;;
@@ -281,8 +289,10 @@ do
     envelope=${CTE_NONE}
     message=${CTE_NONE}
 
+    getEffectivePom ${pom} ${effective} "${repo}" "${SETTINGS}"
+
     # Get URL
-    url=$(getURL ${pom} ${effective} "${repo}" "${SSH_GIT}" "${OVERRIDE_FILE}" "${SETTINGS}")
+    url=$(getURL ${effective} "${repo}" "${SSH_GIT}" "${OVERRIDE_FILE}" "${SETTINGS}")
     echo "     getURL stage - ${url}"
 
     groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
