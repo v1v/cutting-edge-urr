@@ -472,6 +472,7 @@ function getNewLightVersion {
                     ${SETTINGS} \
                     -Dartifact=${groupId}:${artifactId}:LATEST \
                     -Dpackaging=pom \
+                    -Dtransitive=false \
                     -Ddest=${new_pom} >>${build_log} 2>&1
 
     normalisePackagingIssue ${new_pom}
