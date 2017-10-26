@@ -321,6 +321,7 @@ do
                 message=$(analyseTopological ${validate_log})
             fi
         else
+            echo "     validate envelope stage - ${CTE_SKIPPED}"
             envelope=$CTE_SKIPPED
             message=$CTE_SKIPPED
         fi
@@ -372,7 +373,6 @@ do
 
     notify "${groupId}" "${artifactId}" "${version}" "${newVersion}" "${url}" "${state}" "${description}" "${envelope}" "${message}" "${HTML}" "${JSON}" "${PME}" "${PME_ALL}"
     echo "     notify stage - ${state}"
-    echo "     'old GAV' - ${groupId}:${artifactId}:${version} 'new GAV' - ${groupId}:${artifactId}:${newVersion}"
     let "index++"
 done
 
