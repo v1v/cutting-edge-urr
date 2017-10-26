@@ -246,11 +246,7 @@ function initialise {
         fi
 
         echo "Getting hpi dependencies..."
-        mvn -B -V -s ${SETTINGS} clean org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies \
-                    -Dmdep.copyPom \
-                    -DincludeTypes=hpi \
-                    ${excludeArtifacts} \
-                    ${excludeGroups} > /dev/null
+        copyDependencies $CURRENT ${excludeArtifacts} ${excludeGroups} ${SETTINGS}
 
         # Remove unused artifacts
         find . -name *.hpi -delete
@@ -274,6 +270,11 @@ function initialise {
 ################################# MAIN #########################################
 
 initialise
+
+if [ $LIGHT == true ] ; then
+    echo "Getting latest releases from the remote repos... (it might take a bit of time...)"
+    getLatestReleases $CURRENT $SETTINGS
+fi
 
 # Let's remove duplicated dependencies by using a temp folder
 cd ${CURRENT}
