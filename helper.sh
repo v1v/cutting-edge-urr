@@ -21,7 +21,7 @@ source "$( dirname "${BASH_SOURCE[0]}" )/utils.sh"
 #
 #   getURL  "azure-pom-effective.xml" "./target/azure" true "./override.properties" "~/m2/settings.xml"
 #
-# Returns the github URL/unreachable/scm
+# Returns the github URL/unreachable/scm and also the errorlevel
 #
 function getURL {
     effective=$1
@@ -70,8 +70,9 @@ function getURL {
             status=${CTE_SCM}
         fi
     fi
-
     echo ${status}
+    [ "$status" == "${CTE_UNREACHABLE}" -o "$status" == "${CTE_SCM}" ] && return 1 || return 0
+
 }
 
 # Public: Get Effective POM
