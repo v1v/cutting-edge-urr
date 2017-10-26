@@ -84,6 +84,15 @@ teardown() {
     [ "$status" -eq 1 ]
 }
 
+@test "Should return effective POM" {
+    wget -q "https://raw.githubusercontent.com/jenkinsci/maven-plugin/maven-plugin-3.0/pom.xml" -O ${TEMP_FILE}
+    run getEffectivePom ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}"
+    [ "$status" -eq 0 ]
+
+    run getEffectivePom "null" ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}"
+    [ "$status" -eq 1 ]
+}
+
 @test "Should return URL when queering Maven plugin" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/maven-plugin/maven-plugin-3.0/pom.xml" -O ${TEMP_FILE}
     run getURL ${TEMP_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}

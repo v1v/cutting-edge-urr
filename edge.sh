@@ -293,8 +293,11 @@ do
     description=${CTE_NONE}
     url=${CTE_NONE}
 
-    # Get Effective POM
     getEffectivePom ${pom} ${effective} "${repo}" "${SETTINGS}"
+
+    # Get URL
+    url=$(getURL ${effective} "${repo}" "${SSH_GIT}" "${OVERRIDE_FILE}" "${SETTINGS}")
+    echo "     getURL stage - ${url}"
 
     groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
     artifactId=$(getPomProperty ${effective} "project.artifactId" ${SETTINGS})
