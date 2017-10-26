@@ -173,6 +173,7 @@ function download {
         fi
     fi
     echo ${status}
+    [ "$status" == "${CTE_UNREACHABLE}" ] && return 1 || return 0
 }
 
 
@@ -445,3 +446,36 @@ function getJsonPropertyFromEnvelope {
     echo $(cat ${envelope} | jq ".plugins[\"${artifactId}\"].${property}") | sed 's#"##g'
 }
 
+# Private: Given a particular GA it returns the latest release version
+#
+# $1 - repository
+# $2 - groupId
+# $3 - artifactId
+# #4 - settings
+#
+# Returns the latest version of a given GA
+#
+function getNewLightVersion {
+    repo=$1
+    groupId=$2
+    artifactId=$3
+    settings=$4
+
+    new_pom=${repo}.light
+
+    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+
+    mvn -B org.apache.maven.plugins:maven-dependency-plugin:2.8:get \
+                    ${SETTINGS} \
+                    -Dartifact=${groupId}:${artifactId}:LATEST \
+                    -Dpackaging=pom \
+                    -Ddest=${new_pom}
+    normalisePackagingIssue ${new_pom}
+    newVersion=$(getPomProperty ${new_pom} "project.version" ${settings})
+    if [ $? -eq 0 ] ; then
+        echo $newVersion
+    else
+        echo $CTE_NONE
+        return 1
+    fi
+}
