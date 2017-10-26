@@ -331,11 +331,11 @@ function pme {
     cd ${location}
     if [ -e ${PME} ] ; then
 
-        if ! grep "<dependency>" ${PME} ; then
+        # This is the way we skip running PME injection when no new dependencies
+        if ! grep --quiet "<dependency>" ${PME} ; then
             echo ${CTE_SKIPPED}
             return 1
         fi
-
 
         [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
 
