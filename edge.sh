@@ -304,18 +304,25 @@ do
 
     groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
     artifactId=$(getPomProperty ${effective} "project.artifactId" ${SETTINGS})
+    version=$(getPomProperty ${effective} "project.version" ${SETTINGS})
 
     if [ $LIGHT == true ] ; then
         validate_log=${repo}.validate
-        state=${CTE_SUCCESS}
+        description=${CTE_LIGHT}
+        state=${CTE_DEFAULT}
 
         newVersion=$(getNewLightVersion ${repo} ${groupId} ${artifactId} ${SETTINGS})
-        envelope=$(validate ${groupId}:${artifactId} ${newVersion} ${validate_log} ${CURRENT} "${SETTINGS}")
-        echo "     validate envelope stage - ${envelope}"
-        if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
-            message="validated"
+        if [ "${version}" != "${newVersion}" ] ; then
+            envelope=$(validate ${groupId}:${artifactId} ${newVersion} ${validate_log} ${CURRENT} "${SETTINGS}")
+            echo "     validate envelope stage - ${envelope}"
+            if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
+                message="validated"
+            else
+                message=$(analyseTopological ${validate_log})
+            fi
         else
-            message=$(analyseTopological ${validate_log})
+            envelope=$CTE_SKIPPED
+            message=$CTE_SKIPPED
         fi
 
     else
