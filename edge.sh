@@ -241,7 +241,7 @@ function initialise {
         fi
 
         echo "Getting hpi dependencies..."
-        copyDependencies $CURRENT ${excludeArtifacts} ${excludeGroups} ${SETTINGS}
+        copyDependencies $CURRENT "${excludeArtifacts}" "${excludeGroups}" "${SETTINGS}"
 
         # Remove unused artifacts
         find . -name *.hpi -delete
