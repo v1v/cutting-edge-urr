@@ -296,9 +296,11 @@ do
     message=${CTE_NONE}
 
     getEffectivePom ${pom} ${effective} "${repo}" "${SETTINGS}"
+    effectivePomStatus=$?
 
     # Get URL
     url=$(getURL ${effective} "${repo}" "${SSH_GIT}" "${OVERRIDE_FILE}" "${SETTINGS}")
+    getURLStatus=$?
     echo "     getURL stage - ${url}"
 
     groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
