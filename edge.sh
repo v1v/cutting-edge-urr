@@ -288,57 +288,74 @@ do
     newVersion=${CTE_NONE}
     envelope=${CTE_NONE}
     message=${CTE_NONE}
+    description=${CTE_NONE}
+    url=${CTE_NONE}
 
+    # Get Effective POM
     getEffectivePom ${pom} ${effective} "${repo}" "${SETTINGS}"
-    effectivePomStatus=$?
-
-    # Get URL
-    url=$(getURL ${effective} "${repo}" "${SSH_GIT}" "${OVERRIDE_FILE}" "${SETTINGS}")
-    getURLStatus=$?
-    echo "     getURL stage - ${url}"
 
     groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
     artifactId=$(getPomProperty ${effective} "project.artifactId" ${SETTINGS})
 
-    # If it's found then
-    if [ "$url" != "${CTE_UNREACHABLE}" -a "$url" != "${CTE_SCM}" ] ; then
-        # Transform URL to be able to use it within rosie and also support multimodule maven projects
-        url=$(transform $url)
-        echo "     transform stage - ${url}"
-        repo="${EDGE}/$(basename ${url})"
+    if [ $LIGHT ] ; then
+        validate_log=${repo}.validate
+        state=${CTE_SUCCESS}
 
-        download=$(download ${url} ${repo})
-        echo "     download stage - ${download}"
-        if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
-            build_log=${repo}.log
-            description=$(buildDependency ${repo} ${build_log} ${SETTINGS} ${SKIP_TESTS} "${RECIPES_FOLDER}")
-            newVersion=$(getBuildProperty  ${repo} "project.version" "version" "${SETTINGS}")
-            echo "     buildDependency stage - ${description}"
-            if [ "${description}" == "${CTE_PASSED}" ] ; then
-                state=${CTE_SUCCESS}
-                validate_log=${build_log}.validate
-                envelope=$(validate ${groupId}:${artifactId} ${newVersion} ${validate_log} ${CURRENT} "${SETTINGS}")
-                echo "     validate envelope stage - ${envelope}"
-                if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
-                    message="validated"
+        newVersion=$(getNewLightVersion ${repo} ${groupId} ${artifactId} ${SETTINGS})
+        envelope=$(validate ${groupId}:${artifactId} ${newVersion} ${validate_log} ${CURRENT} "${SETTINGS}")
+        echo "     validate envelope stage - ${envelope}"
+        if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
+            message="validated"
+        else
+            message=$(analyseTopological ${validate_log})
+        fi
+
+    else
+        # Get URL
+        url=$(getURL ${effective} "${repo}" "${SSH_GIT}" "${OVERRIDE_FILE}" "${SETTINGS}")
+        echo "     getURL stage - ${url}"
+
+        # If it's found then
+        if [ "$url" != "${CTE_UNREACHABLE}" -a "$url" != "${CTE_SCM}" ] ; then
+            # Transform URL to be able to use it within rosie and also support multimodule maven projects
+            url=$(transform $url)
+            echo "     transform stage - ${url}"
+            repo="${EDGE}/$(basename ${url})"
+
+            download=$(download ${url} ${repo})
+            echo "     download stage - ${download}"
+            if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
+                build_log=${repo}.log
+                description=$(buildDependency ${repo} ${build_log} ${SETTINGS} ${SKIP_TESTS} "${RECIPES_FOLDER}")
+                newVersion=$(getBuildProperty  ${repo} "project.version" "version" "${SETTINGS}")
+                echo "     buildDependency stage - ${description}"
+                if [ "${description}" == "${CTE_PASSED}" ] ; then
+                    state=${CTE_SUCCESS}
+                    validate_log=${build_log}.validate
+                    envelope=$(validate ${groupId}:${artifactId} ${newVersion} ${validate_log} ${CURRENT} "${SETTINGS}")
+                    echo "     validate envelope stage - ${envelope}"
+                    if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
+                        message="validated"
+                    else
+                        message=$(analyseTopological ${validate_log})
+                    fi
                 else
-                    message=$(analyseTopological ${validate_log})
+                    state=${CTE_WARNING}
                 fi
             else
-                state=${CTE_WARNING}
+                description=${CTE_UNREACHABLE}
+                state=${CTE_DANGER}
             fi
         else
-            description=${CTE_UNREACHABLE}
+            description=${url}
             state=${CTE_DANGER}
         fi
-    else
-        description=${url}
-        state=${CTE_DANGER}
     fi
 
-    # Get GAVC
+    # Get Version
     version=$(getPomProperty ${effective} "project.version" ${SETTINGS})
 
+    # Notify
     notify "${groupId}" "${artifactId}" "${version}" "${newVersion}" "${url}" "${state}" "${description}" "${envelope}" "${message}" "${HTML}" "${JSON}" "${PME}"
     echo "     notify stage - ${state}"
     echo "     'old GAV' - ${groupId}:${artifactId}:${version} 'new GAV' - ${groupId}:${artifactId}:${newVersion}"
