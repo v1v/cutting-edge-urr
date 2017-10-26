@@ -388,7 +388,7 @@ if [ $pme -eq 0 ] ; then
     skipNullable=true
     find . -name envelope.json -type f -not -path "**/generated-resources/*" -not -path "**/test/resource/*" | sort | while read file
     do
-        verify ${JSON} ${file} ${skipNullable} ${VERIFY}
+        verify ${JSON} ${file} ${VERIFY} ${skipNullable}
         if [ $? -ne 0 ] ; then
             pme=1
             status=$CTE_FAILED
