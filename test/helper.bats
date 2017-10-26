@@ -214,12 +214,15 @@ EOT
     download https://github.com/dantheman213/java-hello-world-maven.git "${TEMP_DIR_NEW}"
     run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
     echo "passed" > "${TEMP_DIR_NEW}/.status.flag"
     run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
     echo "failed" > "${TEMP_DIR_NEW}/.status.flag"
     run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_FAILED}"
+    [ "$status" -eq 1 ]
 }
 
 @test "Should buildDependency with override options for some maven customised builds" {
@@ -230,6 +233,7 @@ EOT
 EOT
     run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
 
     # This is cached
     cat <<EOT > ${TEMP_DIR}/myapp.build
@@ -238,6 +242,7 @@ EOT
 EOT
     run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
 
     # remove cached flag
     rm ${TEMP_DIR_NEW}/maven/.status.flag
@@ -247,6 +252,8 @@ EOT
 EOT
     run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_FAILED}"
+    [ "$status" -eq 1 ]
+
 }
 
 @test "Should buildDependency with override options for gradle customised builds" {
@@ -257,6 +264,7 @@ EOT
 EOT
     run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
 
     cat <<EOT > ${TEMP_DIR}/gradle-plugin.build
 [build]
@@ -265,11 +273,13 @@ EOT
     # This is cached
     run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
 
     # This is cached
     rm ${TEMP_DIR_NEW}/gradle-plugin/.status.flag
     run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_FAILED}"
+    [ "$status" -eq 1 ]
 }
 
 @test "Should cleanLeftOvers" {
