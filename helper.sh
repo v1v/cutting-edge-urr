@@ -371,7 +371,8 @@ function cleanLeftOvers {
     OUTPUT=$2
     ## Clean leftovers
     git checkout -- pom.xml products/  >> ${OUTPUT} 2>&1
-    [ -e ${TARGET}/pom-manip-ext-marker.txt ] && rm ${TARGET}/pom-manip-ext-marker.txt  >> ${OUTPUT} 2>&1 || true
+    rm ${TARGET}/pom-manip-ext-marker.*  >> ${OUTPUT} 2>&1 || true
+    rm -rf ${TARGET}/manipulator-cache  >> ${OUTPUT} 2>&1 || true
 }
 
 
