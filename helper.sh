@@ -38,7 +38,7 @@ function getURL {
 
     build_log=${repo}.log
 
-    [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+    [ -f "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
     # Get effective artifact
     artifactId=$(getPomProperty ${effective} "project.artifactId" ${settings})
@@ -106,8 +106,8 @@ function getEffectivePom {
     normalisePackagingIssue ${pom}
 
     # Get effective-pom
-    [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-    mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} >>${build_log} 2>&1
+    [ -f "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
+    mvn -B --quiet ${SETTINGS_} -f ${pom} help:effective-pom -Doutput=${effective} >>${build_log} 2>&1
 }
 
 # Private: Transform github urls therefore private repos are accessible
@@ -206,7 +206,7 @@ function buildDependency {
     # Cache previous build executions
     if [ ! -e $FLAG_FILE ] ; then
         MAVEN_FLAGS="-DskipTests=${skip} -Dfindbugs.skip=${skip} -Dmaven.test.skip=${skip} -Dmaven.javadoc.skip=true"
-        [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+        [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
         artifactId=$(getBuildProperty  ${repo} "project.artifactId" "name" "${settings}")
 
@@ -214,7 +214,7 @@ function buildDependency {
         if [ -e "${override_file}" ] ; then
             build_command=$(getOverridedProperty "${override_file}" build.command)
         else
-            build_command="mvn -e -V -B -ff clean install ${MAVEN_FLAGS} -T 1C ${SETTINGS}"
+            build_command="mvn -e -V -B -ff clean install ${MAVEN_FLAGS} -T 1C ${SETTINGS_}"
         fi
         ${build_command} >> ${build_log} 2>&1
         [ $? -eq 0 ] && status=${CTE_PASSED} || status=${CTE_FAILED}
@@ -277,7 +277,7 @@ function validate {
 
     TARGET=${location}/target
 
-    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+    [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
     cd $location
 
@@ -291,12 +291,12 @@ function validate {
 
     # Manipulate
     java -jar $TARGET/pom-manipulation-cli-2.12.jar \
-            ${SETTINGS} \
+            ${SETTINGS_} \
             -f pom.xml \
             -DdependencyOverride.${ga}@*=${version} > ${build_log} 2>&1
 
     # Validate envelope
-    mvn envelope:validate ${SETTINGS} >> ${build_log} 2>&1
+    mvn envelope:validate ${SETTINGS_} >> ${build_log} 2>&1
     build_status=$?
     [ $build_status -eq 0 ] && status=${CTE_SUCCESS} || status=${CTE_WARNING}
     cleanLeftOvers "${TARGET}" "${build_log}"
@@ -337,13 +337,13 @@ function pme {
             return 1
         fi
 
-        [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+        [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
-        mvn install --fail-at-end -f ${PME} ${SETTINGS} >> ${output} 2>&1
+        mvn install --fail-at-end -f ${PME} ${SETTINGS_} >> ${output} 2>&1
 
-        groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS})
-        artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
-        version=$(getPomProperty ${PME} "project.version" ${SETTINGS})
+        groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS_})
+        artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS_})
+        version=$(getPomProperty ${PME} "project.version" ${SETTINGS_})
 
         cleanLeftOvers $target $output
 
@@ -354,7 +354,7 @@ function pme {
             -Ddebug \
             -Denforcer.skip \
             -DdependencyManagement=${groupId}:${artifactId}:${version} \
-            ${SETTINGS} >> ${output} 2>&1
+            ${SETTINGS_} >> ${output} 2>&1
 
         build_status=$?
 
@@ -473,10 +473,10 @@ function getNewLightVersion {
     new_pom=${repo}.light
     build_log=${repo}.log
 
-    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+    [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
     mvn -B org.apache.maven.plugins:maven-dependency-plugin:2.8:get \
-                    ${SETTINGS} \
+                    ${SETTINGS_} \
                     -Dartifact=${groupId}:${artifactId}:LATEST \
                     -Dpackaging=pom \
                     -Dtransitive=false \
@@ -507,9 +507,9 @@ function copyDependencies {
     settings=$4
 
     cd $current
-    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+    [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
-    mvn -B ${SETTINGS} clean org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies \
+    mvn -B ${SETTINGS_} clean org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies \
                 -Dmdep.copyPom \
                 -DincludeTypes=hpi \
                 ${excludeArtifacts} \
@@ -528,8 +528,8 @@ function getLatestReleases {
     settings=$2
 
     cd $current
-    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+    [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
-    mvn -B ${SETTINGS} org.codehaus.mojo:versions-maven-plugin:2.5:use-latest-releases > /dev/null
+    mvn -B ${SETTINGS_} org.codehaus.mojo:versions-maven-plugin:2.5:use-latest-releases > /dev/null
     cleanLeftOvers $current "/dev/null"
 }
