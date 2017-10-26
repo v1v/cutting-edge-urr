@@ -190,7 +190,7 @@ function download {
 #
 #   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "settings.xml" "true" "recipes"
 #
-# Returns the exit code of the last command executed.
+# Returns the exit code of the build status and also print the status.
 #
 function buildDependency {
     repo=$1
@@ -219,7 +219,9 @@ function buildDependency {
         [ $? -eq 0 ] && status=${CTE_PASSED} || status=${CTE_FAILED}
         echo $status > $FLAG_FILE
     fi
-    cat ${FLAG_FILE}
+    status=$(cat ${FLAG_FILE})
+    echo $status
+    [ "$status" == "${CTE_PASSED}" ] && return 0 || return 1
 }
 
 # Private: Query build properties independently what build system is used.
