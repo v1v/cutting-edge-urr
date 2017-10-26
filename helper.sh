@@ -462,6 +462,7 @@ function getNewLightVersion {
     settings=$4
 
     new_pom=${repo}.light
+    build_log=${repo}.log
 
     [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
 
@@ -469,7 +470,8 @@ function getNewLightVersion {
                     ${SETTINGS} \
                     -Dartifact=${groupId}:${artifactId}:LATEST \
                     -Dpackaging=pom \
-                    -Ddest=${new_pom}
+                    -Ddest=${new_pom} >>${build_log} 2>&1
+
     normalisePackagingIssue ${new_pom}
     newVersion=$(getPomProperty ${new_pom} "project.version" ${settings})
     if [ $? -eq 0 ] ; then

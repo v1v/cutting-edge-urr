@@ -270,6 +270,7 @@ function initialise {
 initialise
 
 # Let's remove duplicated dependencies by using a temp folder
+cd ${CURRENT}
 mkdir -p ${UNIQUE_POMS}
 find . -name *.pom -type f -not -path "./target/**/src/*" | while read -r i; do cp "$i" ${UNIQUE_POMS}; done
 total=$(find ${UNIQUE_POMS} -name *.pom -type f | sort | uniq | wc -l | sed 's# ##g')
@@ -297,7 +298,7 @@ do
     groupId=$(getPomProperty ${effective} "project.groupId" ${SETTINGS})
     artifactId=$(getPomProperty ${effective} "project.artifactId" ${SETTINGS})
 
-    if [ $LIGHT ] ; then
+    if [ $LIGHT == true ] ; then
         validate_log=${repo}.validate
         state=${CTE_SUCCESS}
 
