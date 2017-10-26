@@ -400,5 +400,5 @@ if [ $pme -eq 0 ] ; then
 fi
 
 echo "Verify stage - ${status}"
-exit $pme
+[ "${status}" == "${CTE_SKIPPED}" ] && exit 0 || exit $pme
 
