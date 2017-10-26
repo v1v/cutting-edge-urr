@@ -337,7 +337,7 @@ do
             echo "     download stage - ${download}"
             if [ "${download}" != "${CTE_UNREACHABLE}" ] ; then
                 build_log=${repo}.log
-                description=$(buildDependency ${repo} ${build_log} ${SETTINGS} ${SKIP_TESTS} "${RECIPES_FOLDER}")
+                description=$(buildDependency "${repo}" "${build_log}" "${SETTINGS}" "${SKIP_TESTS}" "${RECIPES_FOLDER}")
                 newVersion=$(getBuildProperty  ${repo} "project.version" "version" "${SETTINGS}")
                 echo "     buildDependency stage - ${description}"
                 if [ "${description}" == "${CTE_PASSED}" ] ; then
