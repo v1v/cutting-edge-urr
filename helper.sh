@@ -330,6 +330,13 @@ function pme {
     target=${location}/target
     cd ${location}
     if [ -e ${PME} ] ; then
+
+        if ! grep "<dependency>" ${PME} ; then
+            echo ${CTE_SKIPPED}
+            return 1
+        fi
+
+
         [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
 
         mvn install --fail-at-end -f ${PME} ${SETTINGS} >> ${output} 2>&1

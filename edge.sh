@@ -312,7 +312,7 @@ do
         state=${CTE_DEFAULT}
 
         newVersion=$(getNewLightVersion ${repo} ${groupId} ${artifactId} ${SETTINGS})
-        if [ "${version}" != "${newVersion}" ] ; then
+        if [ $? -eq 0 -a "${version}" != "${newVersion}" ] ; then
             envelope=$(validate ${groupId}:${artifactId} ${newVersion} ${validate_log} ${CURRENT} "${SETTINGS}")
             echo "     validate envelope stage - ${envelope}"
             if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
@@ -322,6 +322,7 @@ do
             fi
         else
             echo "     validate envelope stage - ${CTE_SKIPPED}"
+            description=$CTE_SKIPPED
             envelope=$CTE_SKIPPED
             message=$CTE_SKIPPED
         fi
@@ -397,6 +398,7 @@ if [ $pme -eq 0 ] ; then
         verify "${JSON}" "${file}" "${VERIFY}" ${skipNullable}
         if [ $? -ne 0 ] ; then
             pme=1
+            status=$CTE_FAILED
             echo "     Verifying $file - failed"
         else
             echo "     Verifying $file - passed"
@@ -404,6 +406,6 @@ if [ $pme -eq 0 ] ; then
     done
 fi
 
-echo "Verify stage - ${pme}"
+echo "Verify stage - ${status}"
 exit $pme
 
