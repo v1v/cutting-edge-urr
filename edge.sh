@@ -45,6 +45,9 @@
 #       -(N)L/--(no-)light
 #			Whether to skip the build install and use the latest release version of each plugin. Default: false
 #
+#       -(N)F/--(no-)force
+#			Whether to rerun PME of non validated dependencies within the subset of validated ones. Default: false
+#
 # OUTPUT:
 #
 #       ./target/edge/report/pom.xml.pme
@@ -104,6 +107,7 @@ EDGE=${CURRENT}/target/edge
 REPORT=${EDGE}/report
 UNIQUE_POMS=${EDGE}/poms
 PME=${REPORT}/pom.xml.pme
+PME_ALL=${REPORT}/pom-all.xml.pme
 JSON=${REPORT}/dependencies.json
 HTML=${REPORT}/dependencies.html
 VERIFY=${REPORT}/verify.txt
@@ -123,6 +127,7 @@ display_help() {
     echo "   -(N)I,  --(no-)incremental Whether to clean or start from the previous execution."
     echo "   -(N)S,  --(no-)ssh         Whether to transform git urls to git+ssh to allow access to private repos."
     echo "   -(N)L,  --(no-)light       Whether to use latest available releases or build each plugin."
+    echo "   -(N)F,  --(no-)force       Whether to rerun PME of non validated dependencies within the subset of validated ones."
     echo "   -h,  --help                Help."
     echo
     exit 0
@@ -185,6 +190,8 @@ INCREMENTAL=true
 SSH_GIT=true
 # Public: Whether to use the latest release avialable or build/install locally.
 LIGHT=false
+# Public: Whether to retry the verify with even unvalidated dependencies.
+FORCE=false
 
 if [ "$#" -eq 0 ]; then
     echo "INFO: Using default values"
@@ -205,10 +212,12 @@ case $key in
     -I|--incremental) INCREMENTAL=true; shift 1;;
     -S|--ssh) SSH_GIT=true; shift 1;;
     -L|--light) LIGHT=true; shift 1;;
+    -F|--force) FORCE=true; shift 1;;
     -NX|--no-skip-test) SKIP_TESTS=false; shift 1;;
     -NI|--no-incremental) INCREMENTAL=false; shift 1;;
     -NS|--no-ssh) SSH_GIT=false; shift 1;;
     -NL|--no-light) LIGHT=false; shift 1;;
+    -NF|--no-force) FORCE=false; shift 1;;
     *) # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift ;;
@@ -253,6 +262,7 @@ function initialise {
         openHTML ${HTML}
         openJSON ${JSON}
         openPME  ${PME}
+        openPME  ${PME_ALL}
     else
         # Forcing to create the report folder in case the incremental execution didn't go through it yet
         mkdir -p ${REPORT}
@@ -366,6 +376,12 @@ do
         fi
     fi
 
+
+    # To be used by the FORCE flag option
+    if [ "${envelope}" != "${CTE_NONE}" ] ; then
+        addDependency "${groupId}" "${artifactId}" "${newVersion}" ${PME_ALL}
+    fi
+
     # Get Version
     version=$(getPomProperty ${effective} "project.version" ${SETTINGS})
 
@@ -378,13 +394,23 @@ done
 closeHTML ${HTML}
 closeJSON ${JSON}
 closePME  ${PME}
+closePME  ${PME_ALL}
 
 # Run the PME stuff
-echo "Preparing PME stage ...(it might take a bit of time...)"
+echo "Preparing PME stage for validated plugins ...(it might take a bit of time...)"
 
 status=$(pme ${CURRENT} ${PME} "${REPORT}/pme.log" "${DIFF}" ${SETTINGS})
 pme=$?
-echo "Final PME stage - ${status}"
+echo "Final PME stage for validated plugins - ${status}"
+
+if [ $FORCE == true ] ; then
+    echo "Preparing PME stage for all plugins ...(it might take a bit of time...)"
+
+    status=$(pme ${CURRENT} ${PME_ALL} "${REPORT}/pme-all.log" "${DIFF}" ${SETTINGS})
+    pme=$?
+    echo "Final PME stage for all plugins - ${status}"
+    ## TODO: think about whether if it failed this stage and previous one didn't whether we would like to fail the entire script or not
+fi
 
 # Verify PME vs each Envelope only if PME execution was success
 if [ $pme -eq 0 ] ; then
