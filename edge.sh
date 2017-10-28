@@ -213,7 +213,7 @@ case $key in
     -NX|--no-skip-test) SKIP_TESTS=false; shift 1;;
     -NI|--no-incremental) INCREMENTAL=false; shift 1;;
     -NS|--no-ssh) SSH_GIT=false; shift 1;;
-    -NL|--no-light) light=false; shift 1;;
+    -NL|--no-light) LIGHT=false; shift 1;;
     *) # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift ;;
