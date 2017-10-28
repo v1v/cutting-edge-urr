@@ -8,12 +8,14 @@
 CTE_SUCCESS="success"
 CTE_WARNING="warning"
 CTE_DANGER="danger"
+CTE_DEFAULT="default"
 CTE_PASSED="passed"
 CTE_FAILED="failed"
 CTE_NONE="none"
 CTE_SCM="scm"
 CTE_SKIPPED="skipped"
 CTE_UNREACHABLE="unreachable"
+CTE_LIGHT="light"
 
 # Public: Get a particular property of a given POM file.
 #
@@ -30,8 +32,8 @@ CTE_UNREACHABLE="unreachable"
 # Returns the exit code of the last command executed.
 #
 function getPomProperty {
-    [ -f "$3" ] && SETTINGS="-s $3" || SETTINGS=""
-    mvn -B help:evaluate -Dexpression=$2 -f $1 ${SETTINGS} 2>/dev/null | grep -e '^[^\[]' | grep -v 'INFO'
+    [ -f "$3" ] && settings="-s $3" || settings=""
+    mvn -B help:evaluate -Dexpression=$2 -f $1 ${settings} 2>/dev/null | grep -e '^[^\[]' | grep -v 'INFO'
 }
 
 
@@ -64,10 +66,12 @@ function getGradleProperty {
 #
 #   getXMLProperty "pom.xml" "scm/url"
 #
-# Returns the exit code of the last command executed.
+# Returns the exit code of the last command executed and print the property value
 #
 function getXMLProperty {
-    xmlstarlet pyx $1 | grep -v ^A | xmlstarlet p2x | xmlstarlet sel -t -v $2
+    set -o pipefail
+    property=$(xmlstarlet pyx $1 | grep -v ^A | xmlstarlet p2x | xmlstarlet sel -t -v $2)
+    [ $? -eq 0 ] && echo $property || return 1
 }
 
 # Public: Get the overrided property given a property files and the key.
@@ -83,7 +87,10 @@ function getXMLProperty {
 #
 function getOverridedProperty {
     if [ -e $1 ] ; then
-        git config --file=$1 --get $2
+        property=$(git config --file=$1 --get $2 2>&1)
+        [ $? -eq 0 ] && echo $property || return 1
+    else
+        return 1
     fi
 }
 
