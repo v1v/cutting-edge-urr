@@ -371,7 +371,6 @@ function verify {
             _jq() {
                 echo ${row} | base64 --decode | jq -r ${1}
             }
-            notify=0
             envelope=$(_jq '.envelope')
             if [ "${envelope}" == "${CTE_SUCCESS}" ] ; then
                 groupId=$(_jq '.groupId')
@@ -380,20 +379,15 @@ function verify {
                 envelopeVersion=$(getJsonPropertyFromEnvelope $artifactId 'version' $envelopeFile)
                 if [ "${newVersion}" != "${envelopeVersion}" ] ; then
                     if [ "${envelopeVersion}" == "null" ] ; then
-                        if [ ! "$skipNullable" = true ] ; then
+                        if [ $skipNullable != true ] ; then
                             status=1
-                            notify=1
+                            echo "WARN: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}' since it's nullable" | tee -a ${report}
+                        else
+                            echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}' since it's nullable" >> ${report}
                         fi
                     else
                         status=1
-                        notify=1
-                    fi
-                fi
-                if [ $notify -eq 1 ] ; then
-                    if [ ! "${envelopeVersion}" == "null" -a $status -eq 1 ] ; then
                         echo "WARN: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}'" | tee -a ${report}
-                    else
-                        echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' doesn't match pme-version '${newVersion}' since it's nullable" >> ${report}
                     fi
                 else
                     echo "INFO: ${groupId}:${artifactId} envelope-version '${envelopeVersion}' matches pme-version '${newVersion}'" >> ${report}
