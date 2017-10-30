@@ -344,7 +344,7 @@ closePME  ${PME_ALL}
 status=$(pme ${CURRENT} ${PME_ALL} "${REPORT}/pme.log" "${DIFF}" ${SETTINGS})
 pme=$?
 # Print topological dependencies
-analyseTopological "${REPORT}/pme.log"
+analyseTopologicalWithoutFilter "${REPORT}/pme.log"
 echo "Final PME stage - ${status}"
 # End all PME
 

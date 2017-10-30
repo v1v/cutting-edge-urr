@@ -554,7 +554,7 @@ function normalisePackagingIssue {
     sed -i.bck 's#<packaging>hpi</packaging>##g' $1
 }
 
-# Public: Filter log output and gather all the topological error messages
+# Public: Filter log output and gather all the topological error messages per plugin
 #
 # $1 - log.xml
 #
@@ -566,4 +566,19 @@ function normalisePackagingIssue {
 #
 function analyseTopological {
     grep '\[ERROR\] Plugin' $1 | sed 's#.*Plugin##g' | cut -d":" -f2
+}
+
+
+# Public: Filter log output and gather all the topological error messages
+#
+# $1 - log.xml
+#
+# Examples
+#
+#   analyseTopologicalWithoutFilter "build.log"
+#
+# Returns the grep of 'Error Plugin messages'
+#
+function analyseTopologicalWithoutFilter {
+    grep '\[ERROR\] Plugin' $1
 }
