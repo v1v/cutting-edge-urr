@@ -301,7 +301,7 @@ function pme {
     if [ -e ${PME} ] ; then
         [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
 
-        mvn install -f ${PME} ${SETTINGS} >> ${output} 2>&1
+        mvn install --fail-at-end -f ${PME} ${SETTINGS} >> ${output} 2>&1
 
         groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS})
         artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
@@ -311,6 +311,7 @@ function pme {
 
         set -o pipefail
         mvn -B install \
+            --fail-at-end \
             -DversionSuffix=edge \
             -Ddebug \
             -Denforcer.skip \
