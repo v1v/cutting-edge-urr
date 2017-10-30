@@ -65,6 +65,9 @@
 #       ./target/edge/report/diff.html
 #			HTML report with the diff of each pom transformation
 #
+#       ./target/edge/report/topological.txt
+#			Plain text file with the list of topological dependencies.
+#
 # NOTE:
 #
 #		Output folder is related to the ${session.executionRootDirectory}
@@ -106,6 +109,7 @@ JSON=${REPORT}/dependencies.json
 HTML=${REPORT}/dependencies.html
 VERIFY=${REPORT}/verify.txt
 DIFF=${REPORT}/diff.html
+TOPOLOGICAL=${REPORT}/topological.txt
 export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 
 ## Arguments
@@ -344,7 +348,7 @@ closePME  ${PME_ALL}
 status=$(pme ${CURRENT} ${PME_ALL} "${REPORT}/pme.log" "${DIFF}" ${SETTINGS})
 pme=$?
 # Print topological dependencies
-analyseTopologicalWithoutFilter "${REPORT}/pme.log"
+analyseTopologicalWithoutFilter "${REPORT}/pme.log" | tee "${TOPOLOGICAL}"
 echo "Final PME stage - ${status}"
 # End all PME
 
