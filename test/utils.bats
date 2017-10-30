@@ -164,21 +164,25 @@ EOT
 
 @test "Should generate dependency when status is success" {
     # Without the xml extension
-    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}
+    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE} "/tmp/null"
     run diff $DEPENDENCY_FILE ${TEMP_FILE}
     refute_output ''
     # With the xml extension
-    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml
+    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml "/tmp/null"
+    run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.xml
+    assert_output ''
+    # With the xml extension
+    notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml
     run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.xml
     assert_output ''
 }
 
 @test "Should not generate dependency when status is not success" {
     # Without the xml extension
-    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" ${TEMP_DIR}/new
+    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" ${TEMP_DIR}/new "/tmp/null"
     assert_file_not_exist ${TEMP_DIR}/new
     # With the xml extension
-    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml
+    notify "group" "artifact" "version" "newversion" "url" "failed" "description" "envelope" "validate" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml "/tmp/null"
     assert_file_not_exist ${TEMP_FILE}.xml
 }
 

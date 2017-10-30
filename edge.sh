@@ -101,6 +101,7 @@ EDGE=${CURRENT}/target/edge
 REPORT=${EDGE}/report
 UNIQUE_POMS=${EDGE}/poms
 PME=${REPORT}/pom.xml.pme
+PME_ALL=${REPORT}/pom_all.xml.pme
 JSON=${REPORT}/dependencies.json
 HTML=${REPORT}/dependencies.html
 VERIFY=${REPORT}/verify.txt
@@ -249,6 +250,7 @@ function initialise {
         openHTML ${HTML}
         openJSON ${JSON}
         openPME  ${PME}
+        openPME  ${PME_ALL}
     else
         # Forcing to create the report folder in case the incremental execution didn't go through it yet
         mkdir -p ${REPORT}
@@ -327,7 +329,7 @@ do
     # Get GAVC
     version=$(getPomProperty ${effective} "project.version" ${SETTINGS})
 
-    notify "${groupId}" "${artifactId}" "${version}" "${newVersion}" "${url}" "${state}" "${description}" "${envelope}" "${message}" "${HTML}" "${JSON}" "${PME}"
+    notify "${groupId}" "${artifactId}" "${version}" "${newVersion}" "${url}" "${state}" "${description}" "${envelope}" "${message}" "${HTML}" "${JSON}" "${PME}" "${PME_ALL}"
     echo "     notify stage - ${state}"
     echo "     'old GAV' - ${groupId}:${artifactId}:${version} 'new GAV' - ${groupId}:${artifactId}:${newVersion}"
     let "index++"
@@ -336,11 +338,15 @@ done
 closeHTML ${HTML}
 closeJSON ${JSON}
 closePME  ${PME}
+closePME  ${PME_ALL}
 
-# Run the PME stuff
-status=$(pme ${CURRENT} ${PME} "${REPORT}/pme.log" "${DIFF}" ${SETTINGS})
+# This is the way to run the PME with all the dependencies
+status=$(pme ${CURRENT} ${PME_ALL} "${REPORT}/pme.log" "${DIFF}" ${SETTINGS})
 pme=$?
+# Print topological dependencies
+analyseTopological "${REPORT}/pme.log"
 echo "Final PME stage - ${status}"
+# End all PME
 
 # Verify PME vs each Envelope only if PME execution was success
 if [ $pme -eq 0 ] ; then
