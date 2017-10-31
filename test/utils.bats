@@ -174,7 +174,7 @@ EOT
     # With the xml extension
     notify "group" "artifact" "oldversion" "version" "url" "success" "description" "success" "validate" "/tmp/null" "/tmp/null" "/tmp/null" ${TEMP_FILE}.xml
     run diff -w $DEPENDENCY_FILE ${TEMP_FILE}.xml
-    assert_output ''
+    refute_output ''
 }
 
 @test "Should not generate dependency when status is not success" {
