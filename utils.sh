@@ -108,6 +108,7 @@ function getOverridedProperty {
 # $10 - html file
 # $11 - json file.
 # $12 - pem file.
+# $13 - pem file with all the dependencies.
 #
 # Examples
 #
@@ -120,6 +121,10 @@ function notify {
     addJSONDependency "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9" "${11}"
     if [ "$8" == "$CTE_SUCCESS" ] ; then
         addDependency "$1" "$2" "$4" "${12}"
+    fi
+    # Let's generate an overall PME file with all the compiled plugins
+    if [ "$6" == "$CTE_SUCCESS" ] ; then
+        addDependency "$1" "$2" "$4" "${13}"
     fi
 }
 
@@ -549,7 +554,7 @@ function normalisePackagingIssue {
     sed -i.bck 's#<packaging>hpi</packaging>##g' $1
 }
 
-# Public: Filter log output and gather all the topological error messages
+# Public: Filter log output and gather all the topological error messages per plugin
 #
 # $1 - log.xml
 #
@@ -561,4 +566,19 @@ function normalisePackagingIssue {
 #
 function analyseTopological {
     grep '\[ERROR\] Plugin' $1 | sed 's#.*Plugin##g' | cut -d":" -f2
+}
+
+
+# Public: Filter log output and gather all the topological error messages
+#
+# $1 - log.xml
+#
+# Examples
+#
+#   analyseTopologicalWithoutFilter "build.log"
+#
+# Returns the grep of 'Error Plugin messages'
+#
+function analyseTopologicalWithoutFilter {
+    grep '\[ERROR\] Plugin' $1
 }
