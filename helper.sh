@@ -11,41 +11,34 @@ source "$( dirname "${BASH_SOURCE[0]}" )/utils.sh"
 
 # Private: Transform dependency and return its github url
 #
-# $1 - POM
-# $2 - Effective POM
-# $3 - Repo absolute folder
-# $4 - ssh git transformation
-# $5 - Override properties
-# $6 - Settings
+# $1 - Effective POM
+# $2 - Repo absolute folder
+# $3 - ssh git transformation
+# $4 - Override properties
+# $5 - Settings
 #
 # Examples
 #
-#   getURL "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" true "./override.properties" "~/m2/settings.xml"
+#   getURL  "azure-pom-effective.xml" "./target/azure" true "./override.properties" "~/m2/settings.xml"
 #
-# Returns the github URL/unreachable/scm
+# Returns the github URL/unreachable/scm and also the errorlevel
 #
 function getURL {
-    pom=$1
-    effective=$2
-    repo=$3
-    ssh_git=$4
-    override=$5
-    settings=$6
+    effective=$1
+    repo=$2
+    ssh_git=$3
+    override=$4
+    settings=$5
 
     # Validate mandatory ARGUMENTS
-    if [ ! -f $pom ] ; then
-        echo "error"
-        exit 1
+    if [ ! -f $effective ] ; then
+        echo $CTE_FAILED
+        return 1
     fi
 
     build_log=${repo}.log
 
-    # Normalise packaging issue
-    normalisePackagingIssue ${pom}
-
-    # Get effective-pom
-    [ -f "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
-    mvn -B --quiet ${SETTINGS} -f ${pom} help:effective-pom -Doutput=${effective} >>${build_log} 2>&1
+    [ -f "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
     # Get effective artifact
     artifactId=$(getPomProperty ${effective} "project.artifactId" ${settings})
@@ -77,10 +70,45 @@ function getURL {
             status=${CTE_SCM}
         fi
     fi
-
     echo ${status}
+    [ "$status" == "${CTE_UNREACHABLE}" -o "$status" == "${CTE_SCM}" ] && return 1 || return 0
+
 }
 
+# Public: Get Effective POM
+#
+# $1 - POM
+# $2 - Effective POM
+# $3 - Repo absolute folder
+# $4 - Settings
+#
+# Examples
+#
+#   getEffectivePom "azure-pom.xml" "azure-pom-effective.xml" "./target/azure" "~/m2/settings.xml"
+#
+# Returns the result of the last command
+#
+function getEffectivePom {
+    pom=$1
+    effective=$2
+    repo=$3
+    settings=$4
+
+    # Validate mandatory ARGUMENTS
+    if [ ! -f $pom ] ; then
+        echo $CTE_FAILED
+        return 1
+    fi
+
+    build_log=${repo}.log
+
+    # Normalise packaging issue
+    normalisePackagingIssue ${pom}
+
+    # Get effective-pom
+    [ -f "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
+    mvn -B --quiet ${SETTINGS_} -f ${pom} help:effective-pom -Doutput=${effective} >>${build_log} 2>&1
+}
 
 # Private: Transform github urls therefore private repos are accessible
 #
@@ -145,6 +173,7 @@ function download {
         fi
     fi
     echo ${status}
+    [ "$status" == "${CTE_UNREACHABLE}" ] && return 1 || return 0
 }
 
 
@@ -162,7 +191,7 @@ function download {
 #
 #   buildDependency "azure-cli-plugin" "azure-cli-plugin.log" "settings.xml" "true" "recipes"
 #
-# Returns the exit code of the last command executed.
+# Returns the exit code of the build status and also print the status.
 #
 function buildDependency {
     repo=$1
@@ -177,7 +206,7 @@ function buildDependency {
     # Cache previous build executions
     if [ ! -e $FLAG_FILE ] ; then
         MAVEN_FLAGS="-DskipTests=${skip} -Dfindbugs.skip=${skip} -Dmaven.test.skip=${skip} -Dmaven.javadoc.skip=true"
-        [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+        [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
         artifactId=$(getBuildProperty  ${repo} "project.artifactId" "name" "${settings}")
 
@@ -185,13 +214,15 @@ function buildDependency {
         if [ -e "${override_file}" ] ; then
             build_command=$(getOverridedProperty "${override_file}" build.command)
         else
-            build_command="mvn -e -V -B -ff clean install ${MAVEN_FLAGS} -T 1C ${SETTINGS}"
+            build_command="mvn -e -V -B -ff clean install ${MAVEN_FLAGS} -T 1C ${SETTINGS_}"
         fi
         ${build_command} >> ${build_log} 2>&1
         [ $? -eq 0 ] && status=${CTE_PASSED} || status=${CTE_FAILED}
         echo $status > $FLAG_FILE
     fi
-    cat ${FLAG_FILE}
+    status=$(cat ${FLAG_FILE})
+    echo $status
+    [ "$status" == "${CTE_PASSED}" ] && return 0 || return 1
 }
 
 # Private: Query build properties independently what build system is used.
@@ -246,7 +277,7 @@ function validate {
 
     TARGET=${location}/target
 
-    [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
+    [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
 
     cd $location
 
@@ -260,12 +291,12 @@ function validate {
 
     # Manipulate
     java -jar $TARGET/pom-manipulation-cli-2.12.jar \
-            ${SETTINGS} \
+            ${SETTINGS_} \
             -f pom.xml \
             -DdependencyOverride.${ga}@*=${version} > ${build_log} 2>&1
 
     # Validate envelope
-    mvn envelope:validate ${SETTINGS} >> ${build_log} 2>&1
+    mvn envelope:validate ${SETTINGS_} >> ${build_log} 2>&1
     build_status=$?
     [ $build_status -eq 0 ] && status=${CTE_SUCCESS} || status=${CTE_WARNING}
     cleanLeftOvers "${TARGET}" "${build_log}"
@@ -299,13 +330,20 @@ function pme {
     target=${location}/target
     cd ${location}
     if [ -e ${PME} ] ; then
-        [ -e "${settings}" ] && SETTINGS="-s ${settings}" || SETTINGS=""
 
-        mvn install --fail-at-end -f ${PME} ${SETTINGS} >> ${output} 2>&1
+        # This is the way we skip running PME injection when no new dependencies
+        if ! grep --quiet "<dependency>" ${PME} ; then
+            echo ${CTE_SKIPPED}
+            return 1
+        fi
 
-        groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS})
-        artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS})
-        version=$(getPomProperty ${PME} "project.version" ${SETTINGS})
+        [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
+
+        mvn install --fail-at-end -f ${PME} ${SETTINGS_} >> ${output} 2>&1
+
+        groupId=$(getPomProperty ${PME} "project.groupId" ${SETTINGS_})
+        artifactId=$(getPomProperty ${PME} "project.artifactId" ${SETTINGS_})
+        version=$(getPomProperty ${PME} "project.version" ${SETTINGS_})
 
         cleanLeftOvers $target $output
 
@@ -316,7 +354,7 @@ function pme {
             -Ddebug \
             -Denforcer.skip \
             -DdependencyManagement=${groupId}:${artifactId}:${version} \
-            ${SETTINGS} >> ${output} 2>&1
+            ${SETTINGS_} >> ${output} 2>&1
 
         build_status=$?
 
@@ -340,7 +378,8 @@ function cleanLeftOvers {
     OUTPUT=$2
     ## Clean leftovers
     git checkout -- pom.xml products/  >> ${OUTPUT} 2>&1
-    [ -e ${TARGET}/pom-manip-ext-marker.txt ] && rm ${TARGET}/pom-manip-ext-marker.txt  >> ${OUTPUT} 2>&1 || true
+    rm ${TARGET}/pom-manip-ext-marker.*  >> ${OUTPUT} 2>&1 || true
+    rm -rf ${TARGET}/manipulator-cache  >> ${OUTPUT} 2>&1 || true
 }
 
 
@@ -416,3 +455,81 @@ function getJsonPropertyFromEnvelope {
     echo $(cat ${envelope} | jq ".plugins[\"${artifactId}\"].${property}") | sed 's#"##g'
 }
 
+# Public: Given a particular GA it returns the latest release version
+#
+# $1 - repository
+# $2 - groupId
+# $3 - artifactId
+# #4 - settings
+#
+# Returns the latest version of a given GA
+#
+function getNewLightVersion {
+    repo=$1
+    groupId=$2
+    artifactId=$3
+    settings=$4
+
+    new_pom=${repo}.light
+    build_log=${repo}.log
+
+    [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
+
+    mvn -B org.apache.maven.plugins:maven-dependency-plugin:2.8:get \
+                    ${SETTINGS_} \
+                    -Dartifact=${groupId}:${artifactId}:LATEST \
+                    -Dpackaging=pom \
+                    -Dtransitive=false \
+                    -Ddest=${new_pom} >>${build_log} 2>&1
+
+    normalisePackagingIssue ${new_pom}
+    newVersion=$(getPomProperty ${new_pom} "project.version" ${settings})
+    if [ $? -eq 0 ] ; then
+        echo $newVersion
+    else
+        echo $CTE_NONE
+        return 1
+    fi
+}
+
+# Public: Copy dependencies
+#
+# $1 - excludeArtifacts
+# $2 - excludeGroups
+# $3 - settings
+#
+# Returns the result of the latest command
+#
+function copyDependencies {
+    current=$1
+    excludeArtifacts=$2
+    excludeGroups=$3
+    settings=$4
+
+    cd $current
+    [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
+
+    mvn -B ${SETTINGS_} clean org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy-dependencies \
+                -Dmdep.copyPom \
+                -DincludeTypes=hpi \
+                ${excludeArtifacts} \
+                ${excludeGroups} > /dev/null
+}
+
+# Public: Get the latest releases from the remote repos
+#
+# $1 - current
+# $2 - settings
+#
+# Returns the result of the latest command
+#
+function getLatestReleases {
+    current=$1
+    settings=$2
+
+    cd $current
+    [ -e "${settings}" ] && SETTINGS_="-s ${settings}" || SETTINGS_=""
+
+    mvn -B ${SETTINGS_} org.codehaus.mojo:versions-maven-plugin:2.5:use-latest-releases > /dev/null
+    cleanLeftOvers $current "/dev/null"
+}

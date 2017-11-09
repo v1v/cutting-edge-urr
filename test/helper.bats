@@ -5,16 +5,18 @@ load 'libs/bats-assert/load'
 
 setup() {
     source helper.sh
-    export TEMP_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
-    export EFFECTIVE_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
-    export TEMP_DIR=$(mktemp -d /tmp/bats.XXXXXXXXXX)
-    export OVERRIDE_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
-    export NO_SCM_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
-    export CONNECTION_POM_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
-    export TEMP_DIR_NEW=${TEMP_DIR}.new
-    export JSON_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
-    export ENVELOPE_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
-    export DIFFERENT_VERSION_JSON_FILE=$(mktemp /tmp/bats.XXXXXXXXXX)
+
+    export TEMP_DIR=$(mktemp -d /tmp/helper.XXXXXXXXXX)
+    export TEMP_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
+    export EFFECTIVE_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
+    export OVERRIDE_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
+    export NO_SCM_POM_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
+    export WRONG_SCM_POM_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
+    export CONNECTION_POM_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
+    export TEMP_DIR_NEW="${TEMP_DIR}/.new"
+    export JSON_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
+    export ENVELOPE_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
+    export DIFFERENT_VERSION_JSON_FILE=$(mktemp ${TEMP_DIR}/bats.XXXXXXXXXX)
 
     cat <<EOT > $OVERRIDE_FILE
 [url]
@@ -29,6 +31,23 @@ EOT
   <artifactId>artifact</artifactId>
   <version>1.0</version>
   <packaging>hpi</packaging>
+</project>
+EOT
+
+    cat <<EOT > $WRONG_SCM_POM_FILE
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jenkins-ci.plugins</groupId>
+  <artifactId>gradle</artifactId>
+  <version>1.26</version>
+  <packaging>hpi</packaging>
+  <scm>
+    <connection>scm:git:git://git@github.com/jenkinsci/pipeline-model-definition-plugin.git/pipeline-model-api</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-model-definition-plugin.git/pipeline-model-api</developerConnection>
+    <tag>pipeline-model-definition-1.1.6</tag>
+    <url>https://github.com/jenkinsci/pipeline-model-definition-plugin/pipeline-model-api</url>
+  </scm>
 </project>
 EOT
 
@@ -53,44 +72,55 @@ EOT
 }
 
 teardown() {
-    rm ${TEMP_FILE}
     rm -rf ${TEMP_DIR}
-    rm -rf ${TEMP_DIR_NEW}
-    rm ${OVERRIDE_FILE}
-    rm ${NO_SCM_POM_FILE}
-    rm ${CONNECTION_POM_FILE}
-    rm $EFFECTIVE_FILE
-    rm ${JSON_FILE}
-    rm ${ENVELOPE_FILE}
-    rm ${DIFFERENT_VERSION_JSON_FILE}
+}
+
+@test "Should return effective POM" {
+    wget -q "https://raw.githubusercontent.com/jenkinsci/maven-plugin/maven-plugin-3.0/pom.xml" -O ${TEMP_FILE}
+    run getEffectivePom ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}"
+    [ "$status" -eq 0 ]
+
+    run getEffectivePom "null" ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}"
+    [ "$status" -eq 1 ]
 }
 
 @test "Should return URL when queering Maven plugin" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/maven-plugin/maven-plugin-3.0/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "http://github.com/jenkinsci/maven-plugin"
+    [ "$status" -eq 0 ]
 }
 
 @test "Should return overrided_url when quering ANT plugin in an existing override file" {
     wget -q "https://raw.githubusercontent.com/jenkinsci/ant-plugin/ant-1.7/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
+    run getURL ${TEMP_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "overrided_url"
+    [ "$status" -eq 0 ]
 }
 
 @test "Should return unreachalbe when quering ace-editor plugin " {
     wget -q "https://raw.githubusercontent.com/jenkinsci/js-libs/master/ace-editor/pom.xml" -O ${TEMP_FILE}
-    run getURL ${TEMP_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
-    assert_output ${CTE_UNREACHABLE}
+    run getURL ${TEMP_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
+    assert_output ${CTE_SCM}
+    [ "$status" -eq 1 ]
 }
 
 @test "Should return scm when quering POM without SCM " {
-    run getURL ${NO_SCM_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
+    run getURL ${NO_SCM_POM_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output ${CTE_SCM}
+    [ "$status" -eq 1 ]
+}
+
+@test "Should return scm when quering POM with multimodule SCM" {
+    run getURL ${WRONG_SCM_POM_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
+    assert_output ${CTE_UNREACHABLE}
+    [ "$status" -eq 1 ]
 }
 
 @test "Should return connection URL when quering POM scm " {
-    run getURL ${CONNECTION_POM_FILE} ${EFFECTIVE_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
+    run getURL ${CONNECTION_POM_FILE} "${TEMP_DIR_NEW}" true ${OVERRIDE_FILE}
     assert_output "git://github.com/jenkinsci/gradle-plugin.git"
+    [ "$status" -eq 0 ]
 }
 
 @test "Should return same git url when based on organisation/repo" {
@@ -184,12 +214,15 @@ EOT
     download https://github.com/dantheman213/java-hello-world-maven.git "${TEMP_DIR_NEW}"
     run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
     echo "passed" > "${TEMP_DIR_NEW}/.status.flag"
     run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
     echo "failed" > "${TEMP_DIR_NEW}/.status.flag"
     run buildDependency "${TEMP_DIR_NEW}" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" true
     assert_output "${CTE_FAILED}"
+    [ "$status" -eq 1 ]
 }
 
 @test "Should buildDependency with override options for some maven customised builds" {
@@ -200,6 +233,7 @@ EOT
 EOT
     run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
 
     # This is cached
     cat <<EOT > ${TEMP_DIR}/myapp.build
@@ -208,6 +242,7 @@ EOT
 EOT
     run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
 
     # remove cached flag
     rm ${TEMP_DIR_NEW}/maven/.status.flag
@@ -217,6 +252,8 @@ EOT
 EOT
     run buildDependency "${TEMP_DIR_NEW}/maven" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_FAILED}"
+    [ "$status" -eq 1 ]
+
 }
 
 @test "Should buildDependency with override options for gradle customised builds" {
@@ -227,6 +264,7 @@ EOT
 EOT
     run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
 
     cat <<EOT > ${TEMP_DIR}/gradle-plugin.build
 [build]
@@ -235,11 +273,13 @@ EOT
     # This is cached
     run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_PASSED}"
+    [ "$status" -eq 0 ]
 
     # This is cached
     rm ${TEMP_DIR_NEW}/gradle-plugin/.status.flag
     run buildDependency "${TEMP_DIR_NEW}/gradle-plugin" "${TEMP_FILE}" "${HOME}/.m2/settings.xml" "true" "${TEMP_DIR}"
     assert_output "${CTE_FAILED}"
+    [ "$status" -eq 1 ]
 }
 
 @test "Should cleanLeftOvers" {
